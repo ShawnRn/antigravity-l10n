@@ -312,6 +312,8 @@ try {
     "allow/deny agent command execution outside the sandbox.": "允许/拒绝智能体在沙箱外执行命令。",
     "external tools the agent can call via model context protocol.": "智能体可以通过模型上下文协议 (Model Context Protocol) 调用的外部工具。",
     "refresh": "刷新",
+    "delete": "删除",
+    "this will permanently delete the project and all conversations within it. this action cannot be undone.": "这将永久删除该项目及其中的所有会话。此操作无法撤销。",
     "danger zone": "危险区域",
     "delete project": "删除项目",
     "permanently delete this project and all of its conversations.": "永久删除此项目及其所有会话。",
@@ -468,7 +470,8 @@ try {
     { pattern: /Explored (\\d+) files?/gi, replace: "探索了 $1 个文件" },
     { pattern: /Edited\\s+([a-zA-Z]{1,4})\\s+(.+)/gi, replace: "编辑了 $1 文件 $2" },
     { pattern: /Edited\\s+(.+)/gi, replace: "编辑了 $1" },
-    { pattern: /Ran\\s+(.+)/gi, replace: "执行了命令 $1" }
+    { pattern: /Ran\\s+(.+)/gi, replace: "执行了命令 $1" },
+    { pattern: /Are you sure you want to delete the project (.+)\?/gi, replace: "您确定要删除项目 $1 吗？" }
   ];
 
   function shouldSkipNode(node) {
