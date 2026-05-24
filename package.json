@@ -1,0 +1,17 @@
+{
+  "name": "antigravity-l10n",
+  "version": "1.0.0",
+  "description": "Antigravity UI 中文本地化补丁 (Chinese Localization Patch)",
+  "main": "apply_patch.js",
+  "scripts": {
+    "apply": "node apply_patch.js"
+  },
+  "keywords": [
+    "antigravity",
+    "localization",
+    "l10n",
+    "chinese"
+  ],
+  "author": "",
+  "license": "MIT"
+}
