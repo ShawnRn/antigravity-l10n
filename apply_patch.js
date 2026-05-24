@@ -366,7 +366,8 @@ try {
     "yesterday": "昨天",
     "am": "上午",
     "pm": "下午",
-    "a high-risk mode that disables all safety barriers. the agent operates with full system access, auto-executes all terminal commands, and reads or writes to all local files without review prompts.": "一种禁用所有安全屏障的高风险模式。智能体运行于完整的系统访问权限下，自动执行所有终端命令，读写所有本地文件时均无需审查提示。"
+    "a high-risk mode that disables all safety barriers. the agent operates with full system access, auto-executes all terminal commands, and reads or writes to all local files without review prompts.": "一种禁用所有安全屏障的高风险模式。智能体运行于完整的系统访问权限下，自动执行所有终端命令，读写所有本地文件时均无需审查提示。",
+    "working.": "正在执行。"
   };
 
   // 仅对长而唯一的短语使用正则替换，避免污染普通单词（如 App, Open, File）
@@ -411,7 +412,12 @@ try {
     { pattern: /Today (\d+:\d+)\s*AM/gi, replace: "今天上午 $1" },
     { pattern: /Today (\d+:\d+)\s*PM/gi, replace: "今天下午 $1" },
     { pattern: /Yesterday (\d+:\d+)\s*AM/gi, replace: "昨天上午 $1" },
-    { pattern: /Yesterday (\d+:\d+)\s*PM/gi, replace: "昨天下午 $1" }
+    { pattern: /Yesterday (\d+:\d+)\s*PM/gi, replace: "昨天下午 $1" },
+    { pattern: /Thought for (\\d+)s?/gi, replace: "思考了 $1 秒" },
+    { pattern: /Explored (\\d+) files?/gi, replace: "探索了 $1 个文件" },
+    { pattern: /Edited\\s+([a-zA-Z]{1,4})\\s+(.+)/gi, replace: "编辑了 $1 文件 $2" },
+    { pattern: /Edited\\s+(.+)/gi, replace: "编辑了 $1" },
+    { pattern: /Ran\\s+(.+)/gi, replace: "执行了命令 $1" }
   ];
 
   function shouldSkipNode(node) {
