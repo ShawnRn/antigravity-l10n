@@ -55,6 +55,7 @@ try {
   const l10nCode = `
 // ==================== ANTIGRAVITY L10N PATCH ====================
 (function() {
+
   // 使用全小写作为键，实现大小写不敏感的高鲁棒性匹配
   const translationDict = {
     // 登录与身份验证界面 (Login & Authentication)
@@ -246,7 +247,126 @@ try {
     "request review": "需要审查",
 
     // Conversations
-    "agent settings and permissions for conversations outside of projects.": "针对项目外对话的智能体设置与权限。"
+    "agent settings and permissions for conversations outside of projects.": "针对项目外对话的智能体设置与权限。",
+
+    // 增补系统常用 UI 控件
+    "typeahead menu": "输入预测菜单",
+    "sidebar": "侧边栏",
+    "toggle sidebar": "切换侧边栏",
+    "go back": "返回",
+    "go forward": "前进",
+    "display options": "显示选项",
+    "select project": "选择项目",
+    "ask anything, @ to mention, / for actions": "提问任何问题，使用 @ 提及，/ 执行操作",
+    "add context": "添加上下文",
+    "select model, current: no model selected": "选择模型，当前：未选择模型",
+    "no model selected": "未选择模型",
+    "record voice memo": "录制语音备忘录",
+    "send message": "发送消息",
+    "select environment": "选择环境",
+    "local": "本地",
+    "edit project-specific settings": "编辑项目特定设置",
+    "edit project name": "编辑项目名称",
+    "add folder": "添加文件夹",
+    "no token data available.": "无可用 Token 数据。",
+    "loading workspace customizations...": "正在加载工作区自定义项...",
+    "danger zone": "危险区域",
+    "delete project": "删除项目",
+    "permanently delete this project and all of its conversations.": "永久删除此项目及其所有会话。",
+    "google drive integration not available": "Google 云端硬盘集成不可用",
+    "editor settings": "编辑器设置",
+    "configure editor-specific behaviors and shortcuts.": "配置编辑器特定的行为和快捷键。",
+    "marketplace": "插件市场",
+    "marketplace item url": "插件项 URL",
+    "changes the base url on each extension page. you must restart antigravity to use the new marketplace after changing this value.": "更改每个插件页面的基准 URL。更改此值后，您必须重启 Antigravity 才能使用新的插件市场。",
+    "marketplace gallery url": "插件市场展示 URL",
+    "changes the base url for marketplace search results. you must restart antigravity to use the new marketplace after changing this value.": "更改插件市场搜索结果的基准 URL。更改此值后，您必须重启 Antigravity 才能使用新的插件市场。",
+    "selection actions": "选区操作",
+    "show selection actions": "显示选区操作",
+    "show \"edit\" and \"chat\" buttons when selecting text in the editor.": "在编辑器中选择文本时，显示“编辑”和“聊天”按钮。",
+    "to modify editor settings, open settings within the editor window.": "要修改编辑器设置，请在编辑器窗口中打开“设置”。",
+    "open editor settings": "打开编辑器设置",
+    "configure the browser subagent. it requires": "配置浏览器子智能体。它需要",
+    "to be installed. the browser subagent can be invoked by typing /browser in the conversation input box.": "已安装。可以在会话输入框中输入 /browser 启动浏览器子智能体。",
+    "manage your notification preferences.": "管理您的通知偏好。",
+    "configure default behaviors, skills, and mcp servers.": "配置默认行为、技能和 MCP 服务端。",
+    "token usage": "Token 使用情况",
+    "installed mcp servers": "已安装的 MCP 服务端",
+    "add mcp": "添加 MCP",
+    "loading mcp servers...": "正在加载 MCP 服务端...",
+    "build with google plugins": "使用 Google 插件构建",
+    "customize": "自定义",
+    "feedback type": "反馈类型",
+    "bug report": "缺陷报告",
+    "feature request": "功能建议",
+    "auth and billing": "认证与计费",
+    "general feedback": "通用反馈",
+    "description": "描述",
+    "please describe the issue in detail. the more actionable your feedback, the quicker our team can address your request. some helpful information includes:": "请详细描述问题。您的反馈越具体，我们的团队就能越快处理您的请求。一些有帮助的信息包括：",
+    "steps to reproduce the issue": "重现该问题的步骤",
+    "expected behavior": "预期行为",
+    "actual behavior": "实际行为",
+    "any error messages": "任何错误信息",
+    "any relevant information": "任何相关信息",
+    "steps to reproduce": "重现步骤",
+    "attach a screenshot (optional)": "附加截图（可选）",
+    "attach antigravity server logs": "附加 Antigravity 服务端日志",
+    "send feedback as shawnrain.me@gmail.com": "以 shawnrain.me@gmail.com 身份发送反馈",
+    "we recommend attaching logs. attaching logs will help the antigravity team act on and prioritize your feedback.": "我们建议附加日志。附加日志将有助于 Antigravity 团队处理并优先考虑您的反馈。",
+    "keyboard shortcuts for quick navigation and control.": "用于快速导航和控制的键盘快捷键。",
+    "recommended": "推荐",
+    "open conversation picker": "打开会话选择器",
+    "open file search": "打开文件搜索",
+    "focus input": "聚焦输入框",
+    "navigation": "导航",
+    "file picker": "文件选择器",
+    "select previous conversation": "选择上一个会话",
+    "select next conversation": "选择下一个会话",
+    "conversation": "会话",
+    "toggle model selector": "切换模型选择器",
+    "toggle voice recording": "切换语音录制",
+    "find in pane": "在面板中查找",
+    "layout controls": "布局控制",
+    "toggle auxiliary pane": "切换辅助面板",
+    "zoom in": "放大",
+    "zoom out": "缩小",
+    "reset zoom": "重置缩放",
+    "configure ai models and view your quota.": "配置 AI 模型并查看您的配额。",
+    "refresh quota and credits data": "刷新配额与额度数据",
+    "model credits": "模型额度",
+    "enable ai credit overages": "启用 AI 超额额度",
+    "when toggled on, antigravity will use your ai credits to fulfill model requests once you're out of model quota. antigravity will always use your model quota first before using ai credits.": "开启后，一旦您的模型配额用尽，Antigravity 将使用您的 AI 信用额度来满足模型请求。Antigravity 会在尝试使用 AI 信用额度之前，始终优先使用您的模型配额。",
+    "model quota": "模型配额",
+    "view your available model quota and ai credits. model quota refreshes periodically based on your plan. enable ai credit overages to continue using models when your quota is exhausted.": "查看您可用的模型配额和 AI 信用额度。模型配额会根据您的计划定期刷新。启用 AI 超额额度可以在配额用尽时继续使用模型。",
+    "loading token usage...": "正在加载 Token 使用量...",
+    "global": "全局",
+    "plugin:": "插件:",
+    "no mcp servers": "无 MCP 服务端",
+    "you currently don't have any mcp servers installed.": "您目前未安装任何 MCP 服务端。",
+    "add an mcp server above": "在上方添加一个 MCP 服务端",
+    "select branch": "选择分支",
+    "attaching logs requires an email address": "附加日志需要提供电子邮箱地址",
+    "untitled conversation": "无标题会话",
+
+    // 技能说明的翻译 (只翻译其作用描述)
+    "orchestrates android development tasks including project creation, deployment, sdk management, and environment diagnostics using the \`android\` command-line tool.": "使用 'android' 命令行工具协调 Android 开发任务，包括项目创建、部署、SDK 管理和环境诊断。",
+    "orchestrates android development tasks including project creation, deployment, sdk management, and environment diagnostics using the android command-line tool.": "使用 android 命令行工具协调 Android 开发任务，包括项目创建、部署、SDK 管理和环境诊断。",
+    "design, implement, and debug autonomous ai agents and multi-agent systems using the google antigravity (agy) sdk. activate this skill when the user wants to create, configure, or orchestrate google antigravity agents.": "使用 Google Antigravity (AGY) SDK 设计、实现和调试自主 AI 智能体及多智能体系统。当用户想要创建、配置或编排 Google Antigravity 智能体时，激活此技能。",
+    "build professional native macos apps in swift with swiftui and appkit. full lifecycle - build, debug, test, optimize, ship. cli-only, no xcode.": "使用 Swift 结合 SwiftUI 和 AppKit 构建专业的原生 macOS 应用程序。全生命周期 - 构建、调试、测试、优化、出货。仅限命令行，无需 Xcode。",
+
+    // 增补最新发现的界面死角 (Overview, Review, 历史时间, 提示气泡)
+    "overview": "总览",
+    "review": "审查",
+    "review changes": "审查改动",
+    "subagents": "子智能体",
+    "files changed": "修改的文件",
+    "artifacts": "交付成果 (Artifacts)",
+    "background tasks": "后台任务",
+    "today": "今天",
+    "yesterday": "昨天",
+    "am": "上午",
+    "pm": "下午",
+    "a high-risk mode that disables all safety barriers. the agent operates with full system access, auto-executes all terminal commands, and reads or writes to all local files without review prompts.": "一种禁用所有安全屏障的高风险模式。智能体运行于完整的系统访问权限下，自动执行所有终端命令，读写所有本地文件时均无需审查提示。"
   };
 
   // 仅对长而唯一的短语使用正则替换，避免污染普通单词（如 App, Open, File）
@@ -277,7 +397,21 @@ try {
     { pattern: /Configure the browser subagent\\. It requires Google Chrome to be installed\\. The browser subagent can be invoked by typing \\/browser in the conversation input box\\./gi, replace: "配置浏览器子智能体。它需要安装 Google Chrome。可以在会话输入框中输入 /browser 启动浏览器子智能体。" },
     { pattern: /Controls whether the agent can run custom JavaScript to automate complex browser actions\\./gi, replace: "控制智能体是否可以运行自定义 JavaScript 以自动化复杂的浏览器操作。" },
     { pattern: /Configure allowed and denied URLs for browser actuation\\./gi, replace: "配置允许和拒绝进行浏览器操作的 URL 规则。" },
-    { pattern: /Agent settings and permissions for conversations outside of projects\\./gi, replace: "针对项目外对话的智能体设置与权限。" }
+    { pattern: /Agent settings and permissions for conversations outside of projects\\./gi, replace: "针对项目外对话的智能体设置与权限。" },
+    { pattern: /Rules: (\\d+) tokens/gi, replace: "规则: $1 字节 (tokens)" },
+    { pattern: /Skills: (\\d+) tokens/gi, replace: "技能: $1 字节 (tokens)" },
+    { pattern: /Workflows: (\\d+) tokens/gi, replace: "工作流: $1 字节 (tokens)" },
+    { pattern: /Show (\\d+) breakdowns?/gi, replace: "显示 $1 个细分" },
+    { pattern: /(\\d+)% remaining/gi, replace: "剩余 $1%" },
+    { pattern: /Refreshes in (\\d+) hours?, (\\d+) minutes?/gi, replace: "在 $1 小时 $2 分钟后刷新" },
+    { pattern: /See all \\((\\d+)\\)/gi, replace: "查看全部 ($1)" },
+    { pattern: /^(\\d+)d$/g, replace: "$1天前" },
+    { pattern: /^(\\d+)mo$/g, replace: "$1个月前" },
+    { pattern: /A high-risk mode that disables all safety barriers\\. The agent operates with full system access, auto-executes all terminal commands, and reads or writes to all local files without review prompts\\./gi, replace: "一种禁用所有安全屏障的高风险模式。智能体运行于完整的系统访问权限下，自动执行所有终端命令，读写所有本地文件时均无需审查提示。" },
+    { pattern: /Today (\d+:\d+)\s*AM/gi, replace: "今天上午 $1" },
+    { pattern: /Today (\d+:\d+)\s*PM/gi, replace: "今天下午 $1" },
+    { pattern: /Yesterday (\d+:\d+)\s*AM/gi, replace: "昨天上午 $1" },
+    { pattern: /Yesterday (\d+:\d+)\s*PM/gi, replace: "昨天下午 $1" }
   ];
 
   function shouldSkipNode(node) {
@@ -422,12 +556,97 @@ try {
   console.log('preload.js 注入完成。');
 
   // 7. 修改 menu.js 中的硬编码菜单项 (静态替换)
-  console.log('正在修改 menu.js 硬编码菜单项...');
+  console.log('正在修改 menu.js 硬编码菜单项与系统菜单汉化...');
   const menuPath = path.join(tempDir, 'dist/menu.js');
   if (fs.existsSync(menuPath)) {
     let content = fs.readFileSync(menuPath, 'utf8');
     content = content.replace("label: 'New Window'", "label: '新建窗口'");
     content = content.replace("label: 'Docs'", "label: '文档'");
+    
+    // 增加系统菜单栏翻译逻辑
+    const menuPatchCode = `
+const menuTranslation = {
+  "antigravity": "Antigravity",
+  "file": "文件",
+  "edit": "编辑",
+  "view": "视图",
+  "window": "窗口",
+  "help": "帮助",
+  "about antigravity": "关于 Antigravity",
+  "services": "服务",
+  "hide antigravity": "隐藏 Antigravity",
+  "hide others": "隐藏其他",
+  "show all": "显示全部",
+  "quit antigravity": "退出 Antigravity",
+  "close window": "关闭窗口",
+  "undo": "撤销",
+  "redo": "重做",
+  "cut": "剪切",
+  "copy": "复制",
+  "paste": "粘贴",
+  "paste and match style": "粘贴并匹配样式",
+  "delete": "删除",
+  "select all": "全选",
+  "speech": "语音",
+  "start speaking": "开始朗读",
+  "stop speaking": "停止朗读",
+  "reload": "重新加载",
+  "force reload": "强制重新加载",
+  "toggle developer tools": "开发者工具",
+  "actual size": "实际大小",
+  "zoom in": "放大",
+  "zoom out": "缩小",
+  "toggle fullscreen": "全屏",
+  "minimize": "最小化",
+  "zoom": "缩放",
+  "bring all to front": "前置全部窗口",
+  "search": "搜索"
+};
+
+function translateTemplate(items) {
+    return items.map(item => {
+        let label = item.label;
+        if (label) {
+            const key = label.toLowerCase();
+            if (menuTranslation[key]) {
+                label = menuTranslation[key];
+            }
+        }
+        const config = {
+            label: label,
+            role: item.role,
+            type: item.type,
+            accelerator: item.accelerator,
+            enabled: item.enabled,
+            visible: item.visible,
+            checked: item.checked,
+            id: item.id
+        };
+        if (item.click) {
+            config.click = item.click;
+        }
+        if (item.submenu) {
+            config.submenu = translateTemplate(item.submenu.items);
+        }
+        return config;
+    });
+}
+`;
+    content = content + "\n" + menuPatchCode;
+    
+    // 替换原有的 Menu.setApplicationMenu(menu)
+    content = content.replace(
+      "electron_1.Menu.setApplicationMenu(menu);",
+      `try {
+        const template = translateTemplate(menu.items);
+        const translatedMenu = electron_1.Menu.buildFromTemplate(template);
+        electron_1.Menu.setApplicationMenu(translatedMenu);
+    } catch (e) {
+        console.error('Failed to translate application menu:', e);
+        electron_1.Menu.setApplicationMenu(menu);
+    }`
+    );
+    
     fs.writeFileSync(menuPath, content, 'utf8');
     console.log('menu.js 修改完成。');
   }
