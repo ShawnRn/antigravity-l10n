@@ -415,7 +415,12 @@ try {
     "am": "上午",
     "pm": "下午",
     "a high-risk mode that disables all safety barriers. the agent operates with full system access, auto-executes all terminal commands, and reads or writes to all local files without review prompts.": "一种禁用所有安全屏障的高风险模式。智能体运行于完整的系统访问权限下，自动执行所有终端命令，读写所有本地文件时均无需审查提示。",
-    "working.": "正在执行。"
+    "working.": "正在执行。",
+    "explored": "探索了",
+    "edited": "编辑了",
+    "ran": "执行了",
+    "thought": "思考了",
+    "worked": "工作了"
   };
 
   // 仅对长而唯一的短语使用正则替换，避免污染普通单词（如 App, Open, File）
@@ -471,7 +476,12 @@ try {
     { pattern: /Edited\\s+([a-zA-Z]{1,4})\\s+(.+)/gi, replace: "编辑了 $1 文件 $2" },
     { pattern: /Edited\\s+(.+)/gi, replace: "编辑了 $1" },
     { pattern: /Ran\\s+(.+)/gi, replace: "执行了命令 $1" },
-    { pattern: /Are you sure you want to delete the project (.+)\?/gi, replace: "您确定要删除项目 $1 吗？" }
+    { pattern: /Are you sure you want to delete the project (.+)\?/gi, replace: "您确定要删除项目 $1 吗？" },
+    { pattern: /Worked for (\d+)s/gi, replace: "工作了 $1 秒" },
+    { pattern: /Worked for (\d+)m/gi, replace: "工作了 $1 分钟" },
+    { pattern: /Explored (\d+) artifacts?/gi, replace: "探索了 $1 个交付物" },
+    { pattern: /Explored (\d+) files?, (\d+) folders?/gi, replace: "探索了 $1 个文件，$2 个文件夹" },
+    { pattern: /Explored (\d+) files?, (\d+) searches?/gi, replace: "探索了 $1 个文件，执行了 $2 次搜索" }
   ];
 
   function shouldSkipNode(node) {
