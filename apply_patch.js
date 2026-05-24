@@ -311,6 +311,7 @@ try {
     "allow/deny specific terminal commands.": "允许/拒绝特定的终端命令。",
     "allow/deny agent command execution outside the sandbox.": "允许/拒绝智能体在沙箱外执行命令。",
     "external tools the agent can call via model context protocol.": "智能体可以通过模型上下文协议 (Model Context Protocol) 调用的外部工具。",
+    "refresh": "刷新",
     "danger zone": "危险区域",
     "delete project": "删除项目",
     "permanently delete this project and all of its conversations.": "永久删除此项目及其所有会话。",
