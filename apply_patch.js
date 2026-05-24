@@ -9,7 +9,7 @@ const asarPath = path.join(resourcesPath, 'app.asar');
 const backupAsarPath = path.join(resourcesPath, 'app.asar.bak');
 const tempDir = path.join(__dirname, 'temp_extracted_asar');
 
-console.log('=== Antigravity UI 中文化补丁 (登录汉化增强版) ===');
+console.log('=== Antigravity UI 中文化补丁 (设置与身份验证汉化版) ===');
 
 // 2. 检查 Antigravity 是否存在
 if (!fs.existsSync(appPath)) {
@@ -56,7 +56,7 @@ try {
 // ==================== ANTIGRAVITY L10N PATCH ====================
 (function() {
   const translationDict = {
-    // 登录与欢迎界面 (Login & Welcome)
+    // 登录与身份验证界面 (Login & Authentication)
     "Sign In": "登录",
     "Sign in": "登录",
     "Log in to use the agent": "登录以使用智能体",
@@ -69,8 +69,9 @@ try {
     "There was an error with your authentication. To log in, click": "您的身份验证出错。要登录，请点击",
     "Please verify your account, then sign in again to continue. Learn more by visiting our": "请验证您的账号，然后重新登录以继续。访问我们的网站了解更多：",
     "Login to give your agent access to Google Drive": "登录以授予智能体访问 Google 云端硬盘的权限",
-    "To start using the agent, please sign in with your Google account.": "要开始使用智能体，请使用您的 Google 账号登录。",
     "Welcome to": "欢迎来到",
+    "Authentication Required": "需要身份验证",
+    "Open Settings": "打开设置",
 
     // 基础导航
     "Antigravity": "Antigravity",
@@ -119,7 +120,7 @@ try {
     "Terms of Service": "服务条款",
     "Terms of Service.": "服务条款。",
 
-    // 权限设置 (Permissions Settings)
+    // 权限与智能体设置 (Permissions & Agent Settings)
     "Configure global allowed and denied resource permissions.": "配置全局允许和拒绝的资源权限。",
     "Project-Specific Settings": "项目特定设置",
     "Modify scoped permissions, folders, and agent settings like Sandbox and Terminal Command Execution.": "修改特定项目范围内的权限、文件夹，以及像沙箱和终端命令执行这样的智能体设置。",
@@ -141,6 +142,14 @@ try {
     "Agent Settings": "智能体设置",
     "Security Preset": "安全预设",
     "Unrestricted": "无限制",
+    "Custom": "自定义",
+    "Require Review": "需要审查",
+    "Outside of folders file access policy": "工作文件夹外的文件访问策略",
+    "Configures how the agent tries to access files outside of its working folders.": "配置智能体如何尝试访问其工作文件夹之外的文件。",
+    "Terminal Command Auto Execution": "终端命令自动执行",
+    "Controls whether terminal commands require your approval before running.": "控制终端命令在运行前是否需要您的批准。",
+    "Enable Sandbox Mode (Preview)": "启用沙箱模式（预览）",
+    "Restricts agent tools to a secure, isolated local sandbox.": "限制智能体工具在安全、隔离的本地沙箱中运行。",
     "Choose a predefined security preset for the agent. This controls terminal auto-execution policy, and file access policy.": "为智能体选择预设的安全级别。这控制了终端自动执行策略和文件访问策略。",
     "Agent Behavior": "智能体行为",
     "Artifact Review Policy": "Artifact 审查策略",
@@ -150,7 +159,7 @@ try {
     "File Access Rules": "文件访问规则",
     "Network Access Rules": "网络访问规则",
     "Open": "打开",
-    "打开": "打开", // 确保中文匹配
+    "打开": "打开",
     
     // 权限设置中的句段/短语碎片
     "Inherits from": "继承自",
@@ -221,7 +230,10 @@ try {
     { pattern: /Local permissions have higher priority\\./g, replace: "本地权限具有更高的优先级。" },
     { pattern: /Configure the agent's visual theme and display preferences\\./g, replace: "配置智能体的视觉主题与显示偏好。" },
     { pattern: /Display and preserve intermediate thinking steps/g, replace: "显示并保留中间思考步骤" },
-    { pattern: /Configure global allowed and denied resource permissions\\./g, replace: "配置全局允许和拒绝的资源权限。" }
+    { pattern: /Configure global allowed and denied resource permissions\\./g, replace: "配置全局允许和拒绝的资源权限。" },
+    { pattern: /Configures how the agent tries to access files outside of its working folders\\./g, replace: "配置智能体如何尝试访问其工作文件夹之外的文件。" },
+    { pattern: /Controls whether terminal commands require your approval before running\\./g, replace: "控制终端命令在运行前是否需要您的批准。" },
+    { pattern: /Restricts agent tools to a secure, isolated local sandbox\\./g, replace: "限制智能体工具在安全、隔离的本地沙箱中运行。" }
   ];
 
   function shouldSkipNode(node) {
