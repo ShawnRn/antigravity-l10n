@@ -157,6 +157,7 @@ try {
     "agent behavior": "智能体行为",
     "artifact review policy": "Artifact 审查策略",
     "always ask": "每次询问",
+    "always proceed": "总是继续",
     "specifies agent's behavior when asking for review on artifacts, which are documents it creates to enable a richer conversation experience.": "指定智能体在请求审查 Artifact 时（即它为提供更丰富的对话体验而创建的文档）的行为。",
     "local permissions": "本地权限",
     "file access rules": "文件访问规则",
