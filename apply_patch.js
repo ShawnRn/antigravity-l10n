@@ -561,133 +561,22 @@ try {
   fs.appendFileSync(preloadPath, l10nCode);
   console.log('preload.js 注入完成。');
 
-  // 7. 修改 menu.js 中的硬编码菜单项 (使用安全声明式模板静态覆写)
-  console.log('正在修改 menu.js 硬编码菜单项与系统菜单汉化...');
+  // 7. 修改 menu.js 中的硬编码菜单项
+  console.log('正在修改 menu.js 中的自定义硬编码项...');
   const menuPath = path.join(tempDir, 'dist/menu.js');
   if (fs.existsSync(menuPath)) {
     let content = fs.readFileSync(menuPath, 'utf8');
     
-    // 覆盖整个 setupApplicationMenu 函数以保障绝对安全性
-    const newSetupFunction = `
-function setupApplicationMenu(url) {
-    if (!(0, utils_1.isMacOS)()) {
-        const menu = electron_1.Menu.getApplicationMenu();
-        if (!menu) return;
-        addItemToSubmenu(menu, 'File', 0, new electron_1.MenuItem({
-            label: '新建窗口',
-            accelerator: 'CmdOrCtrl+Shift+N',
-            click: () => { (0, utils_1.createWindow)(url); },
-        }));
-        addItemToSubmenu(menu, 'Help', 0, new electron_1.MenuItem({
-            label: '文档',
-            click: async () => { await electron_1.shell.openExternal('https://antigravity.google/docs'); },
-        }));
-        addItemToSubmenu(menu, 'Help', 1, new electron_1.MenuItem({ role: 'toggleDevTools' }));
-        electron_1.Menu.setApplicationMenu(menu);
-        return;
-    }
-
-    const template = [
-      {
-        label: 'Antigravity',
-        submenu: [
-          { role: 'about', label: '关于 Antigravity' },
-          {
-            id: 'check-for-updates',
-            label: updater_1.MenuUpdateStep.CheckForUpdates,
-            click: (menuItem) => {
-                const action = updater_1.updateActions[menuItem.label];
-                action?.();
-            }
-          },
-          { type: 'separator' },
-          { role: 'services', label: '服务' },
-          { type: 'separator' },
-          { role: 'hide', label: '隐藏 Antigravity' },
-          { role: 'hideOthers', label: '隐藏其他' },
-          { role: 'unhide', label: '显示全部' },
-          { type: 'separator' },
-          { role: 'quit', label: '退出 Antigravity' }
-        ]
-      },
-      {
-        label: '文件',
-        submenu: [
-          {
-            label: '新建窗口',
-            accelerator: 'CmdOrCtrl+Shift+N',
-            click: () => { (0, utils_1.createWindow)(url); }
-          },
-          { role: 'close', label: '关闭窗口' }
-        ]
-      },
-      {
-        label: '编辑',
-        submenu: [
-          { role: 'undo', label: '撤销' },
-          { role: 'redo', label: '重做' },
-          { type: 'separator' },
-          { role: 'cut', label: '剪切' },
-          { role: 'copy', label: '复制' },
-          { role: 'paste', label: '粘贴' },
-          { role: 'pasteAndMatchStyle', label: '粘贴并匹配样式' },
-          { role: 'delete', label: '删除' },
-          { role: 'selectAll', label: '全选' }
-        ]
-      },
-      {
-        label: '视图',
-        submenu: [
-          { role: 'reload', label: '重新加载' },
-          { role: 'forceReload', label: '强制重新加载' },
-          { role: 'toggleDevTools', label: '开发者工具' },
-          { type: 'separator' },
-          { role: 'resetZoom', label: '实际大小' },
-          { role: 'zoomIn', label: '放大' },
-          { role: 'zoomOut', label: '缩小' },
-          { type: 'separator' },
-          { role: 'togglefullscreen', label: '全屏' }
-        ]
-      },
-      {
-        label: '窗口',
-        submenu: [
-          { role: 'minimize', label: '最小化' },
-          { role: 'zoom', label: '缩放' },
-          { type: 'separator' },
-          { role: 'front', label: '前置全部窗口' }
-        ]
-      },
-      {
-        label: '帮助',
-        submenu: [
-          {
-            label: '文档',
-            click: async () => {
-                await electron_1.shell.openExternal('https://antigravity.google/docs');
-            }
-          }
-        ]
-      }
-    ];
-
-    try {
-        const translatedMenu = electron_1.Menu.buildFromTemplate(template);
-        electron_1.Menu.setApplicationMenu(translatedMenu);
-    } catch (e) {
-        console.error('Failed to apply translated macOS menu:', e);
-    }
-}
-`;
-    // 替换原 setupApplicationMenu 的实现
-    const startIndex = content.indexOf('function setupApplicationMenu');
-    const endIndex = content.indexOf('function addItemToSubmenu');
-    if (startIndex !== -1 && endIndex !== -1) {
-        content = content.substring(0, startIndex) + newSetupFunction + "\n" + content.substring(endIndex);
-    }
+    content = content
+      .replace("label: 'New Window',", "label: '新建窗口',")
+      .replace("label: 'Docs',", "label: '文档',")
+      .replace(
+        "const submenuItem = appMenu.items.find((item) => item.label === submenuLabel);",
+        "const submenuItem = appMenu.items.find((item) => item.label === submenuLabel || (submenuLabel === 'File' && item.label === '文件') || (submenuLabel === 'Help' && item.label === '帮助'));"
+      );
     
     fs.writeFileSync(menuPath, content, 'utf8');
-    console.log('menu.js 修改完成。');
+    console.log('menu.js 字符替换完成。');
   }
 
   // 7b. 修改 updater.js 中的更新菜单文本
@@ -744,7 +633,7 @@ function setupApplicationMenu(url) {
       .replace("buttons: ['Cancel', 'Quit'],", "buttons: ['取消', '退出'],")
       .replace("label: 'New Window',", "label: '新建窗口',")
       .replace("label: 'No agents running',", "label: '无运行中的智能体',")
-      .replace("label: `Open ${electron_1.app.getName()}`,", "label: '打开 Antigravity',")
+      .replace("label: `Open ${electron_1.app.getName()}`,", "label: `打开 ${electron_1.app.getName()}`,")
       .replace("label: 'Quit',", "label: '退出',");
     fs.writeFileSync(mainJsPath, content, 'utf8');
     console.log('main.js 修改完成。');
