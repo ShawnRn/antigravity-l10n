@@ -9,7 +9,7 @@ const asarPath = path.join(resourcesPath, 'app.asar');
 const backupAsarPath = path.join(resourcesPath, 'app.asar.bak');
 const tempDir = path.join(__dirname, 'temp_extracted_asar');
 
-console.log('=== Antigravity UI 中文化补丁 (设置与身份验证汉化版) ===');
+console.log('=== Antigravity UI 中文化补丁 (个性化细分增强版) ===');
 
 // 2. 检查 Antigravity 是否存在
 if (!fs.existsSync(appPath)) {
@@ -55,185 +55,229 @@ try {
   const l10nCode = `
 // ==================== ANTIGRAVITY L10N PATCH ====================
 (function() {
+  // 使用全小写作为键，实现大小写不敏感的高鲁棒性匹配
   const translationDict = {
     // 登录与身份验证界面 (Login & Authentication)
-    "Sign In": "登录",
-    "Sign in": "登录",
-    "Log in to use the agent": "登录以使用智能体",
-    "To use the agent, please login": "要使用智能体，请登录",
-    "Sign in again": "重新登录",
-    "Login failed": "登录失败",
-    "Continue with Google": "使用 Google 账号继续",
-    "Google Antigravity - Experience liftoff": "Google Antigravity - 体验升空",
-    "To start using the agent, please sign in with your Google account.": "要开始使用智能体，请使用您的 Google 账号登录。",
-    "There was an error with your authentication. To log in, click": "您的身份验证出错。要登录，请点击",
-    "Please verify your account, then sign in again to continue. Learn more by visiting our": "请验证您的账号，然后重新登录以继续。访问我们的网站了解更多：",
-    "Login to give your agent access to Google Drive": "登录以授予智能体访问 Google 云端硬盘的权限",
-    "Welcome to": "欢迎来到",
-    "Authentication Required": "需要身份验证",
-    "Open Settings": "打开设置",
+    "sign in": "登录",
+    "log in to use the agent": "登录以使用智能体",
+    "to use the agent, please login": "要使用智能体，请登录",
+    "sign in again": "重新登录",
+    "login failed": "登录失败",
+    "continue with google": "使用 Google 账号继续",
+    "google antigravity - experience liftoff": "Google Antigravity - 体验升空",
+    "to start using the agent, please sign in with your google account.": "要开始使用智能体，请使用您的 Google 账号登录。",
+    "there was an error with your authentication. to log in, click": "您的身份验证出错。要登录，请点击",
+    "please verify your account, then sign in again to continue. learn more by visiting our": "请验证您的账号，然后重新登录以继续。访问我们的网站了解更多：",
+    "login to give your agent access to google drive": "登录以授予智能体访问 Google 云端硬盘的权限",
+    "welcome to": "欢迎来到",
+    "authentication required": "需要身份验证",
+    "open settings": "打开设置",
 
     // 基础导航
-    "Antigravity": "Antigravity",
-    "Task": "任务",
-    "Settings": "设置",
-    "Implementation Plan": "实施计划",
-    "Walkthrough": "演示与回顾",
-    "Verify": "验证",
+    "antigravity": "Antigravity",
+    "task": "任务",
+    "settings": "设置",
+    "implementation plan": "实施计划",
+    "walkthrough": "演示与回顾",
+    "verify": "验证",
     
     // 侧边栏
-    "New Conversation": "新建会话",
-    "Conversation History": "会话历史",
-    "Scheduled Tasks": "定时任务",
-    "Projects": "项目",
-    "No conversations yet": "暂无会话",
-    "Not in Project": "未关联项目",
-    "Shortcuts": "快捷键",
-    "Provide Feedback": "提供反馈",
+    "general": "通用",
+    "new conversation": "新建会话",
+    "conversation history": "会话历史",
+    "scheduled tasks": "定时任务",
+    "projects": "项目",
+    "no conversations yet": "暂无会话",
+    "not in project": "未关联项目",
+    "shortcuts": "快捷键",
+    "provide feedback": "提供反馈",
     
     // 设置侧边栏标签
-    "Account": "账户",
-    "Appearance": "外观",
-    "Models": "模型",
-    "Customizations": "个性化",
-    "App": "应用",
-    "Antigravity Settings": "Antigravity 设置",
-    "CanMirror": "CanMirror",
-    "Show all": "显示全部",
-    "Conversations": "会话",
+    "account": "账户",
+    "permissions": "权限",
+    "appearance": "外观",
+    "models": "模型",
+    "customizations": "个性化",
+    "app": "应用",
+    "antigravity settings": "Antigravity 设置",
+    "canmirror": "CanMirror",
+    "show all": "显示全部",
+    "conversations": "会话",
+    "browser": "浏览器",
     
     // 账户设置 (Account Settings)
-    "Manage your plan, credentials, and general preferences.": "管理您的计划、凭证和通用偏好。",
-    "Enable Telemetry": "启用数据遥测",
-    "When toggled on, Antigravity collects usage data to help Google enhance performance and features.": "开启后，Antigravity 将收集使用数据，以帮助 Google 提升性能和功能。",
-    "Marketing Emails": "接收营销邮件",
-    "Receive product updates, tips, and promotions from Google Antigravity via email.": "通过电子邮件接收来自 Google Antigravity 的产品更新、提示和促销信息。",
-    "Your Plan:": "您的计划：",
-    "Your Plan: Google AI Pro": "您的计划：Google AI Pro",
-    "You can upgrade to a Google AI Ultra plan to receive the highest rate limits.": "您可以升级到 Google AI Ultra 计划，以获得最高的速率限制。",
-    "Upgrade": "升级",
-    "Email": "电子邮箱",
-    "Sign Out": "退出登录",
-    "Sign out": "退出登录",
-    "By using this app, you agree to its ": "使用此应用即表示您同意其 ",
-    "By using this app, you agree to its": "使用此应用即表示您同意其",
-    "Terms of Service": "服务条款",
-    "Terms of Service.": "服务条款。",
+    "manage your plan, credentials, and general preferences.": "管理您的计划、凭证和通用偏好。",
+    "enable telemetry": "启用数据遥测",
+    "when toggled on, antigravity collects usage data to help google enhance performance and features.": "开启后，Antigravity 将收集使用数据，以帮助 Google 提升性能和功能。",
+    "marketing emails": "接收营销邮件",
+    "receive product updates, tips, and promotions from google antigravity via email.": "通过电子邮件接收来自 Google Antigravity 的产品更新、提示和促销信息。",
+    "your plan:": "您的计划：",
+    "your plan: google ai pro": "您的计划：Google AI Pro",
+    "you can upgrade to a google ai ultra plan to receive the highest rate limits.": "您可以升级到 Google AI Ultra 计划，以获得最高的速率限制。",
+    "upgrade": "升级",
+    "email": "电子邮箱",
+    "sign out": "退出登录",
+    "by using this app, you agree to its ": "使用此应用即表示您同意其 ",
+    "by using this app, you agree to its": "使用此应用即表示您同意其",
+    "terms of service": "服务条款",
+    "terms of service.": "服务条款。",
 
     // 权限与智能体设置 (Permissions & Agent Settings)
-    "Configure global allowed and denied resource permissions.": "配置全局允许和拒绝的资源权限。",
-    "Project-Specific Settings": "项目特定设置",
-    "Modify scoped permissions, folders, and agent settings like Sandbox and Terminal Command Execution.": "修改特定项目范围内的权限、文件夹，以及像沙箱和终端命令执行这样的智能体设置。",
-    "Go To Projects": "转到项目",
-    "File Permissions": "文件权限",
-    "Network Permissions": "网络权限",
-    "Terminal & Tooling Permissions": "终端与工具权限",
-    "Terminal Commands": "终端命令",
-    "Configure allowed terminal commands.": "配置允许执行的终端命令。",
-    "Commands Outside Sandbox": "沙箱外的命令",
-    "Configure allowed commands outside the sandbox.": "配置允许在沙箱外运行的命令。",
-    "MCP Tools": "MCP 工具",
-    "Configure external tools via Model Context Protocol.": "通过模型上下文协议配置外部工具。",
-    "Configure allowed and denied paths for file reads and writes.": "配置允许和拒绝文件读写的路径。",
-    "Configure allowed and denied URLs for reading.": "配置允许和拒绝读取的 URL。",
-    "No folders added yet.": "尚未添加任何文件夹。",
-    "Folders": "文件夹",
-    "+ Add Folder": "+ 添加文件夹",
-    "Agent Settings": "智能体设置",
-    "Security Preset": "安全预设",
-    "Unrestricted": "无限制",
-    "Custom": "自定义",
-    "Require Review": "需要审查",
-    "Outside of folders file access policy": "工作文件夹外的文件访问策略",
-    "Configures how the agent tries to access files outside of its working folders.": "配置智能体如何尝试访问其工作文件夹之外的文件。",
-    "Terminal Command Auto Execution": "终端命令自动执行",
-    "Controls whether terminal commands require your approval before running.": "控制终端命令在运行前是否需要您的批准。",
-    "Enable Sandbox Mode (Preview)": "启用沙箱模式（预览）",
-    "Restricts agent tools to a secure, isolated local sandbox.": "限制智能体工具在安全、隔离的本地沙箱中运行。",
-    "Choose a predefined security preset for the agent. This controls terminal auto-execution policy, and file access policy.": "为智能体选择预设的安全级别。这控制了终端自动执行策略和文件访问策略。",
-    "Agent Behavior": "智能体行为",
-    "Artifact Review Policy": "Artifact 审查策略",
-    "Always Ask": "每次询问",
-    "Specifies Agent's behavior when asking for review on artifacts, which are documents it creates to enable a richer conversation experience.": "指定智能体在请求审查 Artifact 时（即它为提供更丰富的对话体验而创建的文档）的行为。",
-    "Local Permissions": "本地权限",
-    "File Access Rules": "文件访问规则",
-    "Network Access Rules": "网络访问规则",
-    "Open": "打开",
+    "configure global allowed and denied resource permissions.": "配置全局允许和拒绝的资源权限。",
+    "project-specific settings": "项目特定设置",
+    "modify scoped permissions, folders, and agent settings like sandbox and terminal command execution.": "修改特定项目范围内的权限、文件夹，以及像沙箱和终端命令执行这样的智能体设置。",
+    "go to projects": "转到项目",
+    "file permissions": "文件权限",
+    "network permissions": "网络权限",
+    "terminal & tooling permissions": "终端与工具权限",
+    "terminal commands": "终端命令",
+    "configure allowed terminal commands.": "配置允许执行的终端命令。",
+    "commands outside sandbox": "沙箱外的命令",
+    "configure allowed commands outside the sandbox.": "配置允许在沙箱外运行的命令。",
+    "mcp tools": "MCP 工具",
+    "configure external tools via model context protocol.": "通过模型上下文协议配置外部工具。",
+    "configure allowed and denied paths for file reads and writes.": "配置允许和拒绝文件读写的路径。",
+    "configure allowed and denied urls for reading.": "配置允许 and 拒绝读取的 URL。",
+    "no folders added yet.": "尚未添加任何文件夹。",
+    "folders": "文件夹",
+    "+ add folder": "+ 添加文件夹",
+    "agent settings": "智能体设置",
+    "security preset": "安全预设",
+    "unrestricted": "无限制",
+    "custom": "自定义",
+    "require review": "需要审查",
+    "outside of folders file access policy": "工作文件夹外的文件访问策略",
+    "configures how the agent tries to access files outside of its working folders.": "配置智能体如何尝试访问其工作文件夹之外的文件。",
+    "terminal command auto execution": "终端命令自动执行",
+    "controls whether terminal commands require your approval before running.": "控制终端命令在运行前是否需要您的批准。",
+    "enable sandbox mode (preview)": "启用沙箱模式（预览）",
+    "restricts agent tools to a secure, isolated local sandbox.": "限制智能体工具在安全、隔离的本地沙箱中运行。",
+    "choose a predefined security preset for the agent. this controls terminal auto-execution policy, and file access policy.": "为智能体选择预设的安全级别。这控制了终端自动执行策略和文件访问策略。",
+    "agent behavior": "智能体行为",
+    "artifact review policy": "Artifact 审查策略",
+    "always ask": "每次询问",
+    "specifies agent's behavior when asking for review on artifacts, which are documents it creates to enable a richer conversation experience.": "指定智能体在请求审查 Artifact 时（即它为提供更丰富的对话体验而创建的文档）的行为。",
+    "local permissions": "本地权限",
+    "file access rules": "文件访问规则",
+    "network access rules": "网络访问规则",
+    "open": "打开",
     "打开": "打开",
     
     // 权限设置中的句段/短语碎片
-    "Inherits from": "继承自",
-    "Inherits from ": "继承自 ",
+    "inherits from": "继承自",
+    "inherits from ": "继承自 ",
     "global settings": "全局设置",
     "global settings.": "全局设置。",
-    ". Local permissions have higher priority. ": "。本地权限具有更高的优先级。",
-    "Local permissions have higher priority.": "本地权限具有更高的优先级。",
-    "Learn more.": "了解更多。",
-    "Learn more": "了解更多",
-    "Learn more about": "了解更多关于",
-    "Learn more about ": "了解更多关于 ",
+    ". local permissions have higher priority. ": "。本地权限具有更高的优先级。",
+    "local permissions have higher priority.": "本地权限具有更高的优先级。",
+    "learn more.": "了解更多。",
+    "learn more": "了解更多",
+    "learn more about": "了解更多关于",
+    "learn more about ": "了解更多关于 ",
+
+    // 个性化设置 (Customizations Settings)
+    "the breakdown below shows token usage from customizations like skills, rules, and mcp. if the budget is exceeded, large customizations will be truncated automatically.": "以下细分显示了来自技能、规则和 MCP 等自定义项的 Token 使用情况。如果超出了预算，大型自定义项将被自动截断。",
+    "customization token budget exceeded. large customizations will be truncated.": "已超出自定义 Token 预算。大型自定义项将被自动截断。",
+    "% of the customization budget is available.": "% 的个性化预算可用。",
+    "rules": "规则",
+    "skills": "技能",
+    "mcp": "MCP",
+    "hide breakdown": "隐藏细分",
 
     // 外观设置 (Appearance Settings)
-    "Configure the agent's visual theme and display preferences.": "配置智能体的视觉主题与显示偏好。",
-    "Chat Settings": "聊天设置",
-    "Verbose agent chat": "详细智能体聊天",
-    "Display and preserve intermediate thinking steps": "显示并保留中间思考步骤",
-    "Select light, dark, or inherit system settings.": "选择浅色、深色，或继承系统设置。",
-    "Light Theme": "浅色主题",
-    "Dark Theme": "深色主题",
-    "Preset": "预设",
-    "Background": "背景色",
-    "Foreground": "前景色",
-    "Accent": "强调色",
-    "System": "系统默认",
-    "Default Light": "默认浅色",
-    "Default Dark": "默认深色",
+    "configure the agent's visual theme and display preferences.": "配置智能体的视觉主题与显示偏好。",
+    "chat settings": "聊天设置",
+    "verbose agent chat": "详细智能体聊天",
+    "display and preserve intermediate thinking steps": "显示并保留中间思考步骤",
+    "select light, dark, or inherit system settings.": "选择浅色、深色，或继承系统设置。",
+    "light theme": "浅色主题",
+    "dark theme": "深色主题",
+    "preset": "预设",
+    "background": "背景色",
+    "foreground": "前景色",
+    "accent": "强调色",
+    "system": "系统默认",
+    "default light": "默认浅色",
+    "default dark": "默认深色",
 
     // 更多模型与通用 UI
-    "Model Selection": "模型选择",
-    "No models available": "无可用模型",
-    "Select Model": "选择模型",
-    "Check for Updates": "检查更新",
-    "Checking for updates": "正在检查更新",
-    "New Window": "新建窗口",
-    "Close Window": "关闭窗口",
-    "Welcome to the new Antigravity!": "欢迎使用全新的 Antigravity！",
-    "Download the Antigravity IDE": "下载 Antigravity IDE",
-    "Explore the new Antigravity": "探索全新的 Antigravity",
-    "Loading Antigravity": "正在加载 Antigravity",
-    "Setting up…": "正在设置…",
-    "Confirm Quit": "确认退出",
-    "Are you sure you want to quit?": "确定要退出吗？",
-    "There may be agents or background tasks running.": "可能有智能体或后台任务正在运行。",
-    "Submit": "提交",
-    "Skip": "跳过",
-    "Cancel": "取消",
-    "Save": "保存",
-    "Close": "关闭",
-    "Apply": "应用"
+    "model selection": "模型选择",
+    "no models available": "无可用模型",
+    "select model": "选择模型",
+    "checking for updates": "正在检查更新",
+    "new window": "新建窗口",
+    "close window": "关闭窗口",
+    "welcome to the new antigravity!": "欢迎使用全新的 Antigravity！",
+    "download the antigravity ide": "下载 Antigravity IDE",
+    "explore the new antigravity": "探索全新的 Antigravity",
+    "loading antigravity": "正在加载 Antigravity",
+    "setting up…": "正在设置…",
+    "confirm quit": "确认退出",
+    "are you sure you want to quit?": "确定要退出吗？",
+    "there may be agents or background tasks running.": "可能有智能体或后台任务正在运行。",
+    "submit": "提交",
+    "skip": "跳过",
+    "cancel": "取消",
+    "save": "保存",
+    "close": "关闭",
+    "apply": "应用",
+
+    // App Settings
+    "app settings": "应用设置",
+    "manage application settings.": "管理应用设置。",
+    "prevent sleep": "防止休眠",
+    "prevent the computer from sleeping while the app is running.": "在应用运行时防止计算机进入休眠状态。",
+    "keep in menu bar": "保留在菜单栏",
+    "the app will be accessible from the menu bar and will keep running in the background when all windows are closed.": "该应用可从菜单栏访问，并在所有窗口关闭时在后台继续运行。",
+    "notifications": "通知",
+    "notification settings": "通知设置",
+    "to modify notification settings, open your operating system's system preferences.": "要修改通知设置，请打开您操作系统的系统偏好设置。",
+    "open system preferences": "打开系统偏好设置",
+
+    // Browser Settings
+    "browser settings": "浏览器设置",
+    "configure the browser subagent. it requires google chrome to be installed. the browser subagent can be invoked by typing /browser in the conversation input box.": "配置浏览器子智能体。它需要安装 Google Chrome。可以在会话输入框中输入 /browser 启动浏览器子智能体。",
+    "browser javascript execution policy": "浏览器 JavaScript 执行策略",
+    "controls whether the agent can run custom javascript to automate complex browser actions.": "控制智能体是否可以运行自定义 JavaScript 以自动化复杂的浏览器操作。",
+    "actuation permissions": "操作权限",
+    "browser actuation rules": "浏览器操作规则",
+    "configure allowed and denied urls for browser actuation.": "配置允许和拒绝进行浏览器操作的 URL 规则。",
+    "edit": "编辑",
+    "request review": "需要审查",
+
+    // Conversations
+    "agent settings and permissions for conversations outside of projects.": "针对项目外对话的智能体设置与权限。"
   };
 
   // 仅对长而唯一的短语使用正则替换，避免污染普通单词（如 App, Open, File）
   const regexReplacements = [
-    { pattern: /New Conversation/g, replace: "新建会话" },
-    { pattern: /Conversation History/g, replace: "会话历史" },
-    { pattern: /Scheduled Tasks/g, replace: "定时任务" },
-    { pattern: /No conversations yet/g, replace: "暂无会话" },
-    { pattern: /Antigravity Settings/g, replace: "Antigravity 设置" },
-    { pattern: /Manage your plan, credentials, and general preferences\\./g, replace: "管理您的计划、凭证和通用偏好。" },
-    { pattern: /Manage project folders, agent settings, and permissions\\./g, replace: "管理项目文件夹、智能体设置与权限。" },
-    { pattern: /No folders added yet\\./g, replace: "尚未添加任何文件夹。" },
-    { pattern: /Choose a predefined security preset for the agent\\. This controls terminal auto-execution policy, and file access policy\\./g, replace: "为智能体选择预设的安全级别。这控制了终端自动执行策略和文件访问策略。" },
-    { pattern: /Specifies Agent's behavior when asking for review on artifacts, which are documents it creates to enable a richer conversation experience\\./g, replace: "指定智能体在请求审查 Artifact 时（即它为提供更丰富的对话体验而创建的文档）的行为。" },
-    { pattern: /Configure allowed and denied paths for file reads and writes\\./g, replace: "配置允许和拒绝文件读写的路径。" },
-    { pattern: /Configure allowed and denied URLs for reading\\./g, replace: "配置允许和拒绝读取的 URL。" },
-    { pattern: /Local permissions have higher priority\\./g, replace: "本地权限具有更高的优先级。" },
-    { pattern: /Configure the agent's visual theme and display preferences\\./g, replace: "配置智能体的视觉主题与显示偏好。" },
-    { pattern: /Display and preserve intermediate thinking steps/g, replace: "显示并保留中间思考步骤" },
-    { pattern: /Configure global allowed and denied resource permissions\\./g, replace: "配置全局允许和拒绝的资源权限。" },
-    { pattern: /Configures how the agent tries to access files outside of its working folders\\./g, replace: "配置智能体如何尝试访问其工作文件夹之外的文件。" },
-    { pattern: /Controls whether terminal commands require your approval before running\\./g, replace: "控制终端命令在运行前是否需要您的批准。" },
-    { pattern: /Restricts agent tools to a secure, isolated local sandbox\\./g, replace: "限制智能体工具在安全、隔离的本地沙箱中运行。" }
+    { pattern: /New Conversation/gi, replace: "新建会话" },
+    { pattern: /Conversation History/gi, replace: "会话历史" },
+    { pattern: /Scheduled Tasks/gi, replace: "定时任务" },
+    { pattern: /No conversations yet/gi, replace: "暂无会话" },
+    { pattern: /Antigravity Settings/gi, replace: "Antigravity 设置" },
+    { pattern: /Manage your plan, credentials, and general preferences\\./gi, replace: "管理您的计划、凭证和通用偏好。" },
+    { pattern: /Manage project folders, agent settings, and permissions\\./gi, replace: "管理项目文件夹、智能体设置与权限。" },
+    { pattern: /No folders added yet\\./gi, replace: "尚未添加任何文件夹。" },
+    { pattern: /Choose a predefined security preset for the agent\\. This controls terminal auto-execution policy, and file access policy\\./gi, replace: "为智能体选择预设的安全级别。这控制了终端自动执行策略和文件访问策略。" },
+    { pattern: /Specifies Agent's behavior when asking for review on artifacts, which are documents it creates to enable a richer conversation experience\\./gi, replace: "指定智能体在请求审查 Artifact 时（即它为提供更丰富的对话体验而创建的文档）的行为。" },
+    { pattern: /Configure allowed and denied paths for file reads and writes\\./gi, replace: "配置允许和拒绝文件读写的路径。" },
+    { pattern: /Configure allowed and denied URLs for reading\\./gi, replace: "配置允许和拒绝读取的 URL。" },
+    { pattern: /Local permissions have higher priority\\./gi, replace: "本地权限具有更高的优先级。" },
+    { pattern: /Configure the agent's visual theme and display preferences\\./gi, replace: "配置智能体的视觉主题与显示偏好。" },
+    { pattern: /Display and preserve intermediate thinking steps/gi, replace: "显示并保留中间思考步骤" },
+    { pattern: /Configure global allowed and denied resource permissions\\./gi, replace: "配置全局允许和拒绝的资源权限。" },
+    { pattern: /Configures how the agent tries to access files outside of its working folders\\./gi, replace: "配置智能体如何尝试访问其工作文件夹之外的文件。" },
+    { pattern: /Controls whether terminal commands require your approval before running\\./gi, replace: "控制终端命令在运行前是否需要您的批准。" },
+    { pattern: /Restricts agent tools to a secure, isolated local sandbox\\./gi, replace: "限制智能体工具在安全、隔离的本地沙箱中运行。" },
+    { pattern: /Manage application settings\\./gi, replace: "管理应用设置。" },
+    { pattern: /Prevent the computer from sleeping while the app is running\\./gi, replace: "在应用运行时防止计算机进入休眠状态。" },
+    { pattern: /The app will be accessible from the menu bar and will keep running in the background when all windows are closed\\./gi, replace: "该应用可从菜单栏访问，并在所有窗口关闭时在后台继续运行。" },
+    { pattern: /To modify notification settings, open your operating system's system preferences\\./gi, replace: "要修改通知设置，请打开您操作系统的系统偏好设置。" },
+    { pattern: /Configure the browser subagent\\. It requires Google Chrome to be installed\\. The browser subagent can be invoked by typing \\/browser in the conversation input box\\./gi, replace: "配置浏览器子智能体。它需要安装 Google Chrome。可以在会话输入框中输入 /browser 启动浏览器子智能体。" },
+    { pattern: /Controls whether the agent can run custom JavaScript to automate complex browser actions\\./gi, replace: "控制智能体是否可以运行自定义 JavaScript 以自动化复杂的浏览器操作。" },
+    { pattern: /Configure allowed and denied URLs for browser actuation\\./gi, replace: "配置允许和拒绝进行浏览器操作的 URL 规则。" },
+    { pattern: /Agent settings and permissions for conversations outside of projects\\./gi, replace: "针对项目外对话的智能体设置与权限。" }
   ];
 
   function shouldSkipNode(node) {
@@ -270,18 +314,32 @@ try {
     if (!text) return;
     
     const trimmed = text.trim();
-    if (translationDict[trimmed]) {
-      const leadingSpace = text.match(/^\\s*/)[0];
-      const trailingSpace = text.match(/\\s*$/)[0];
-      node.nodeValue = leadingSpace + translationDict[trimmed] + trailingSpace;
+    
+    // 智能处理 Show N breakdown(s) 这样的英语拼接格式
+    if (/^Show \\d+ breakdown$/i.test(trimmed)) {
+      let next = node.nextSibling;
+      if (next && next.nodeType === 3 && next.nodeValue.trim() === 's') {
+        next.nodeValue = ''; // 擦除末尾的复数 s 字符
+      }
+      const num = trimmed.match(/\\d+/)[0];
+      node.nodeValue = "显示 " + num + " 个细分";
       return;
     }
 
-    // 尝试正则替换长短语
+    const key = trimmed.toLowerCase();
+    if (translationDict[key]) {
+      const leadingSpace = text.match(/^\\s*/)[0];
+      const trailingSpace = text.match(/\\s*$/)[0];
+      node.nodeValue = leadingSpace + translationDict[key] + trailingSpace;
+      return;
+    }
+
+    // 尝试正则替换长短语 (直接 replace 以避免 RegExp state lastIndex 陷阱)
     let modified = false;
     for (const item of regexReplacements) {
-      if (item.pattern.test(text)) {
-        text = text.replace(item.pattern, item.replace);
+      const newText = text.replace(item.pattern, item.replace);
+      if (newText !== text) {
+        text = newText;
         modified = true;
       }
     }
@@ -299,8 +357,11 @@ try {
       const attrs = ['placeholder', 'title', 'alt', 'aria-label'];
       for (const attr of attrs) {
         const val = node.getAttribute(attr);
-        if (val && translationDict[val.trim()]) {
-          node.setAttribute(attr, translationDict[val.trim()]);
+        if (val) {
+          const key = val.trim().toLowerCase();
+          if (translationDict[key]) {
+            node.setAttribute(attr, translationDict[key]);
+          }
         }
       }
       
@@ -325,8 +386,11 @@ try {
           }
         }
       }
-      if (document.title && translationDict[document.title.trim()]) {
-        document.title = translationDict[document.title.trim()];
+      if (document.title) {
+        const key = document.title.trim().toLowerCase();
+        if (translationDict[key]) {
+          document.title = translationDict[key];
+        }
       }
     } catch (e) {
       console.error('[L10N] Translation error:', e);
