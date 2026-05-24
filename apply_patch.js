@@ -283,7 +283,7 @@ try {
     "changes the base url for marketplace search results. you must restart antigravity to use the new marketplace after changing this value.": "更改插件市场搜索结果的基准 URL。更改此值后，您必须重启 Antigravity 才能使用新的插件市场。",
     "selection actions": "选区操作",
     "show selection actions": "显示选区操作",
-    "show \"edit\" and \"chat\" buttons when selecting text in the editor.": "在编辑器中选择文本时，显示“编辑”和“聊天”按钮。",
+    'show "edit" and "chat" buttons when selecting text in the editor.': "在编辑器中选择文本时，显示“编辑”和“聊天”按钮。",
     "to modify editor settings, open settings within the editor window.": "要修改编辑器设置，请在编辑器窗口中打开“设置”。",
     "open editor settings": "打开编辑器设置",
     "configure the browser subagent. it requires": "配置浏览器子智能体。它需要",
@@ -309,6 +309,10 @@ try {
     "any error messages": "任何错误信息",
     "any relevant information": "任何相关信息",
     "steps to reproduce": "重现步骤",
+    "describe the bug you encountered...": "请详细描述您遇到的问题...",
+    "please list the steps to reproduce the issue": "请列出重现该问题的步骤",
+    "submit feedback": "提交反馈",
+    "send feedback": "发送反馈",
     "attach a screenshot (optional)": "附加截图（可选）",
     "attach antigravity server logs": "附加 Antigravity 服务端日志",
     "send feedback as shawnrain.me@gmail.com": "以 shawnrain.me@gmail.com 身份发送反馈",
@@ -573,10 +577,38 @@ try {
       .replace(
         "const submenuItem = appMenu.items.find((item) => item.label === submenuLabel);",
         "const submenuItem = appMenu.items.find((item) => item.label === submenuLabel || (submenuLabel === 'File' && item.label === '文件') || (submenuLabel === 'Help' && item.label === '帮助'));"
+      )
+      .replace(
+        "electron_1.Menu.setApplicationMenu(menu);",
+        `// 递归汉化所有顶级和子级菜单项
+    const menuDict = {
+        "File": "文件", "Edit": "编辑", "View": "视图", "Window": "窗口", "Help": "帮助",
+        "New Window": "新建窗口", "Close Window": "关闭窗口", "Close": "关闭",
+        "Undo": "撤销", "Redo": "重做", "Cut": "剪切", "Copy": "复制", "Paste": "粘贴",
+        "Paste and Match Style": "粘贴并匹配样式", "Delete": "删除", "Select All": "全选",
+        "Speech": "语音", "Start Speaking": "开始朗读", "Stop Speaking": "停止朗读",
+        "Reload": "重新加载", "Force Reload": "强制重新加载", "Toggle Developer Tools": "开发者工具",
+        "Actual Size": "实际大小", "Zoom In": "放大", "Zoom Out": "缩小", "Toggle Full Screen": "全屏",
+        "Minimize": "最小化", "Zoom": "缩放", "Bring All to Front": "前置全部窗口",
+        "Docs": "文档", "About Antigravity": "关于 Antigravity", "Services": "服务",
+        "Hide Antigravity": "隐藏 Antigravity", "Hide Others": "隐藏其他", "Show All": "显示全部",
+        "Quit Antigravity": "退出 Antigravity", "Check for Updates": "检查更新",
+        "Checking for Updates...": "正在检查更新...", "Downloading Update...": "正在下载更新...",
+        "Restart to Update": "重启并应用更新"
+    };
+    function translateMenu(m) {
+        if (!m || !m.items) return;
+        m.items.forEach(item => {
+            if (item.label && menuDict[item.label]) item.label = menuDict[item.label];
+            if (item.submenu) translateMenu(item.submenu);
+        });
+    }
+    translateMenu(menu);
+    electron_1.Menu.setApplicationMenu(menu);`
       );
     
     fs.writeFileSync(menuPath, content, 'utf8');
-    console.log('menu.js 字符替换完成。');
+    console.log('menu.js 字符替换与递归汉化注入完成。');
   }
 
   // 7b. 修改 updater.js 中的更新菜单文本
