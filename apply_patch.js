@@ -9,7 +9,7 @@ const asarPath = path.join(resourcesPath, 'app.asar');
 const backupAsarPath = path.join(resourcesPath, 'app.asar.bak');
 const tempDir = path.join(__dirname, 'temp_extracted_asar');
 
-console.log('=== Antigravity UI 中文化补丁 ===');
+console.log('=== Antigravity UI 中文化补丁 (登录汉化增强版) ===');
 
 // 2. 检查 Antigravity 是否存在
 if (!fs.existsSync(appPath)) {
@@ -56,7 +56,23 @@ try {
 // ==================== ANTIGRAVITY L10N PATCH ====================
 (function() {
   const translationDict = {
-    // 导航与基础
+    // 登录与欢迎界面 (Login & Welcome)
+    "Sign In": "登录",
+    "Sign in": "登录",
+    "Log in to use the agent": "登录以使用智能体",
+    "To use the agent, please login": "要使用智能体，请登录",
+    "Sign in again": "重新登录",
+    "Login failed": "登录失败",
+    "Continue with Google": "使用 Google 账号继续",
+    "Google Antigravity - Experience liftoff": "Google Antigravity - 体验升空",
+    "To start using the agent, please sign in with your Google account.": "要开始使用智能体，请使用您的 Google 账号登录。",
+    "There was an error with your authentication. To log in, click": "您的身份验证出错。要登录，请点击",
+    "Please verify your account, then sign in again to continue. Learn more by visiting our": "请验证您的账号，然后重新登录以继续。访问我们的网站了解更多：",
+    "Login to give your agent access to Google Drive": "登录以授予智能体访问 Google 云端硬盘的权限",
+    "To start using the agent, please sign in with your Google account.": "要开始使用智能体，请使用您的 Google 账号登录。",
+    "Welcome to": "欢迎来到",
+
+    // 基础导航
     "Antigravity": "Antigravity",
     "Task": "任务",
     "Settings": "设置",
@@ -74,7 +90,7 @@ try {
     "Shortcuts": "快捷键",
     "Provide Feedback": "提供反馈",
     
-    // 设置侧边栏
+    // 设置侧边栏标签
     "Account": "账户",
     "Appearance": "外观",
     "Models": "模型",
@@ -85,10 +101,42 @@ try {
     "Show all": "显示全部",
     "Conversations": "会话",
     
-    // 设置主体
-    "Manage project folders, agent settings, and permissions.": "管理项目文件夹、智能体设置与权限。",
-    "Folders": "文件夹",
+    // 账户设置 (Account Settings)
+    "Manage your plan, credentials, and general preferences.": "管理您的计划、凭证和通用偏好。",
+    "Enable Telemetry": "启用数据遥测",
+    "When toggled on, Antigravity collects usage data to help Google enhance performance and features.": "开启后，Antigravity 将收集使用数据，以帮助 Google 提升性能和功能。",
+    "Marketing Emails": "接收营销邮件",
+    "Receive product updates, tips, and promotions from Google Antigravity via email.": "通过电子邮件接收来自 Google Antigravity 的产品更新、提示和促销信息。",
+    "Your Plan:": "您的计划：",
+    "Your Plan: Google AI Pro": "您的计划：Google AI Pro",
+    "You can upgrade to a Google AI Ultra plan to receive the highest rate limits.": "您可以升级到 Google AI Ultra 计划，以获得最高的速率限制。",
+    "Upgrade": "升级",
+    "Email": "电子邮箱",
+    "Sign Out": "退出登录",
+    "Sign out": "退出登录",
+    "By using this app, you agree to its ": "使用此应用即表示您同意其 ",
+    "By using this app, you agree to its": "使用此应用即表示您同意其",
+    "Terms of Service": "服务条款",
+    "Terms of Service.": "服务条款。",
+
+    // 权限设置 (Permissions Settings)
+    "Configure global allowed and denied resource permissions.": "配置全局允许和拒绝的资源权限。",
+    "Project-Specific Settings": "项目特定设置",
+    "Modify scoped permissions, folders, and agent settings like Sandbox and Terminal Command Execution.": "修改特定项目范围内的权限、文件夹，以及像沙箱和终端命令执行这样的智能体设置。",
+    "Go To Projects": "转到项目",
+    "File Permissions": "文件权限",
+    "Network Permissions": "网络权限",
+    "Terminal & Tooling Permissions": "终端与工具权限",
+    "Terminal Commands": "终端命令",
+    "Configure allowed terminal commands.": "配置允许执行的终端命令。",
+    "Commands Outside Sandbox": "沙箱外的命令",
+    "Configure allowed commands outside the sandbox.": "配置允许在沙箱外运行的命令。",
+    "MCP Tools": "MCP 工具",
+    "Configure external tools via Model Context Protocol.": "通过模型上下文协议配置外部工具。",
+    "Configure allowed and denied paths for file reads and writes.": "配置允许和拒绝文件读写的路径。",
+    "Configure allowed and denied URLs for reading.": "配置允许和拒绝读取的 URL。",
     "No folders added yet.": "尚未添加任何文件夹。",
+    "Folders": "文件夹",
     "+ Add Folder": "+ 添加文件夹",
     "Agent Settings": "智能体设置",
     "Security Preset": "安全预设",
@@ -102,10 +150,9 @@ try {
     "File Access Rules": "文件访问规则",
     "Network Access Rules": "网络访问规则",
     "Open": "打开",
-    "Configure allowed and denied paths for file reads and writes.": "配置允许和拒绝文件读写的路径。",
-    "Configure allowed and denied URLs for reading.": "配置允许和拒绝读取的 URL。",
+    "打开": "打开", // 确保中文匹配
     
-    // 句段/短语碎片 (解决 Link 等元素分割文本的问题)
+    // 权限设置中的句段/短语碎片
     "Inherits from": "继承自",
     "Inherits from ": "继承自 ",
     "global settings": "全局设置",
@@ -116,94 +163,45 @@ try {
     "Learn more": "了解更多",
     "Learn more about": "了解更多关于",
     "Learn more about ": "了解更多关于 ",
-    
-    // 应用状态与日志
-    "No agents running": "无运行中的智能体",
-    "Active Agents": "活跃智能体",
-    "Agent log": "智能体日志",
-    "Running...": "运行中...",
-    "Idle": "空闲",
-    "Failed": "失败",
-    "Success": "成功",
-    "Completed": "已完成",
-    "Pending": "等待中",
-    "Approved": "已批准",
-    "Denied": "已拒绝",
-    "Waiting for user approval": "等待用户批准",
-    "Approved!": "已批准！",
-    
-    // 命令与运行
-    "Run Command": "运行命令",
-    "Running command": "正在运行命令",
-    "Command execution": "命令执行",
-    "Command Line": "命令行",
-    "Command completed successfully": "命令成功完成",
-    "Command failed": "命令执行失败",
-    
-    // 界面页签与面板
-    "Files": "文件",
-    "Tools": "工具",
-    "Permissions": "权限",
-    "Logs": "日志",
-    "Console": "控制台",
-    "Terminal": "终端",
-    "Workspace": "工作区",
-    "Browser": "浏览器",
-    "Details": "详情",
-    "Summary": "摘要",
-    "Status": "状态",
-    
-    // 按钮与操作
-    "Apply": "应用",
-    "Save": "保存",
-    "Close": "关闭",
-    "OK": "确定",
-    "Yes": "是",
-    "No": "否",
-    "Accept": "接受",
-    "Reject": "拒绝",
-    "Allow": "允许",
-    "Always Allow": "总是允许",
-    "Always Deny": "总是拒绝",
-    "Search...": "搜索...",
-    "Search": "搜索",
-    "Filter...": "过滤...",
-    "Type a message...": "输入消息...",
-    "Send": "发送",
-    "Ask a question": "提问",
-    "Submit": "提交",
-    "Skip": "跳过",
-    "Next": "下一步",
-    "Back": "上一步",
-    "Finish": "完成",
+
+    // 外观设置 (Appearance Settings)
+    "Configure the agent's visual theme and display preferences.": "配置智能体的视觉主题与显示偏好。",
+    "Chat Settings": "聊天设置",
+    "Verbose agent chat": "详细智能体聊天",
+    "Display and preserve intermediate thinking steps": "显示并保留中间思考步骤",
+    "Select light, dark, or inherit system settings.": "选择浅色、深色，或继承系统设置。",
+    "Light Theme": "浅色主题",
+    "Dark Theme": "深色主题",
+    "Preset": "预设",
+    "Background": "背景色",
+    "Foreground": "前景色",
+    "Accent": "强调色",
+    "System": "系统默认",
+    "Default Light": "默认浅色",
+    "Default Dark": "默认深色",
+
+    // 更多模型与通用 UI
+    "Model Selection": "模型选择",
+    "No models available": "无可用模型",
+    "Select Model": "选择模型",
     "Check for Updates": "检查更新",
     "Checking for updates": "正在检查更新",
-    
-    // 设置界面额外项
-    "General Settings": "常规设置",
-    "Theme Mode": "主题模式",
-    "Theme": "主题",
-    "Language": "语言",
-    "Model": "模型",
-    "Model Selection": "模型选择",
-    "Developer Tools": "开发者工具",
-    "Toggle Developer Tools": "切换开发者工具",
-    "Zoom In": "放大",
-    "Zoom Out": "缩小",
-    "Reset Zoom": "重置缩放",
-    "General": "通用",
-    "Advanced": "高级",
-    "Workspace Path": "工作区路径",
-    
-    // 系统对话框
-    "Confirm Quit": "确认退出",
-    "Are you sure you want to quit?": "确定要退出吗？",
-    "There may be agents or background tasks running.": "可能有智能体或后台任务正在运行。",
+    "New Window": "新建窗口",
+    "Close Window": "关闭窗口",
     "Welcome to the new Antigravity!": "欢迎使用全新的 Antigravity！",
     "Download the Antigravity IDE": "下载 Antigravity IDE",
     "Explore the new Antigravity": "探索全新的 Antigravity",
     "Loading Antigravity": "正在加载 Antigravity",
-    "Setting up…": "正在设置…"
+    "Setting up…": "正在设置…",
+    "Confirm Quit": "确认退出",
+    "Are you sure you want to quit?": "确定要退出吗？",
+    "There may be agents or background tasks running.": "可能有智能体或后台任务正在运行。",
+    "Submit": "提交",
+    "Skip": "跳过",
+    "Cancel": "取消",
+    "Save": "保存",
+    "Close": "关闭",
+    "Apply": "应用"
   };
 
   // 仅对长而唯一的短语使用正则替换，避免污染普通单词（如 App, Open, File）
@@ -213,13 +211,17 @@ try {
     { pattern: /Scheduled Tasks/g, replace: "定时任务" },
     { pattern: /No conversations yet/g, replace: "暂无会话" },
     { pattern: /Antigravity Settings/g, replace: "Antigravity 设置" },
+    { pattern: /Manage your plan, credentials, and general preferences\\./g, replace: "管理您的计划、凭证和通用偏好。" },
     { pattern: /Manage project folders, agent settings, and permissions\\./g, replace: "管理项目文件夹、智能体设置与权限。" },
     { pattern: /No folders added yet\\./g, replace: "尚未添加任何文件夹。" },
     { pattern: /Choose a predefined security preset for the agent\\. This controls terminal auto-execution policy, and file access policy\\./g, replace: "为智能体选择预设的安全级别。这控制了终端自动执行策略和文件访问策略。" },
     { pattern: /Specifies Agent's behavior when asking for review on artifacts, which are documents it creates to enable a richer conversation experience\\./g, replace: "指定智能体在请求审查 Artifact 时（即它为提供更丰富的对话体验而创建的文档）的行为。" },
     { pattern: /Configure allowed and denied paths for file reads and writes\\./g, replace: "配置允许和拒绝文件读写的路径。" },
     { pattern: /Configure allowed and denied URLs for reading\\./g, replace: "配置允许和拒绝读取的 URL。" },
-    { pattern: /Local permissions have higher priority\\./g, replace: "本地权限具有更高的优先级。" }
+    { pattern: /Local permissions have higher priority\\./g, replace: "本地权限具有更高的优先级。" },
+    { pattern: /Configure the agent's visual theme and display preferences\\./g, replace: "配置智能体的视觉主题与显示偏好。" },
+    { pattern: /Display and preserve intermediate thinking steps/g, replace: "显示并保留中间思考步骤" },
+    { pattern: /Configure global allowed and denied resource permissions\\./g, replace: "配置全局允许和拒绝的资源权限。" }
   ];
 
   function shouldSkipNode(node) {
@@ -343,7 +345,7 @@ try {
   fs.appendFileSync(preloadPath, l10nCode);
   console.log('preload.js 注入完成。');
 
-  // 7. 修改 menu.js 中的硬编码菜单项 (静态替换，避免运行时写只读 MenuItem.label 引发 TypeError)
+  // 7. 修改 menu.js 中的硬编码菜单项 (静态替换)
   console.log('正在修改 menu.js 硬编码菜单项...');
   const menuPath = path.join(tempDir, 'dist/menu.js');
   if (fs.existsSync(menuPath)) {
