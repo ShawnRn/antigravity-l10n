@@ -506,7 +506,11 @@ try {
     "you can prompt the model to try again or start a": "您可以提示模型重试，或者",
     "you can prompt the model to try again or start a ": "您可以提示模型重试，或者",
     "if the error persists.": "（如果错误仍然存在）。",
-    "you can prompt the model to try again or start a new conversation if the error persists.": "如果错误持续存在，您可以提示模型重试或开启一个新的会话。"
+    "you can prompt the model to try again or start a new conversation if the error persists.": "如果错误持续存在，您可以提示模型重试或开启一个新的会话。",
+    "see our": "请参阅我们的",
+    "see our ": "请参阅我们的",
+    "for more help.": "以获取更多帮助。",
+    "for more help": "以获取更多帮助"
   };
 
   // 仅对长而唯一的短语使用正则替换，避免污染普通单词（如 App, Open, File）
@@ -618,6 +622,10 @@ try {
     { pattern: /Timer:\\s*(\\d+)h/gi, replace: "定时器: $1小时" },
     // === 针对 files changed ===
     { pattern: /(\\d+)\\s+files?\\s+changed/gi, replace: "$1 个文件已修改" },
+    // === 针对 pages/urls/tabs explored ===
+    { pattern: /(\\d+)\\s+pages?/gi, replace: "$1 个页面" },
+    { pattern: /(\\d+)\\s+urls?/gi, replace: "$1 个 URL" },
+    { pattern: /(\\d+)\\s+tabs?/gi, replace: "$1 个标签页" },
     // === 针对 timed check 等时态 ===
     { pattern: /Timed\\s+checked\\s+for\\s+(\\d+)s/gi, replace: "定时检查了 $1 秒" },
     { pattern: /Timed\\s+checking\\s+for\\s+(\\d+)s/gi, replace: "定时检查中 ($1 秒)" },
