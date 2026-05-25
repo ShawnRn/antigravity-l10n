@@ -516,6 +516,12 @@ try {
     "for more help.": "以获取更多帮助。",
     "for more help": "以获取更多帮助",
 
+    // 系统通知汉化 (System Notifications)
+    "action requires your attention": "操作需要您的关注",
+    "the agent is waiting for your input.": "智能体正在等待您的输入。",
+    "task completed": "任务已完成",
+    "the agent has completed the task.": "智能体已完成任务。",
+
     // 新增的工作区无自定义提示 (No customizations found for workspace)
     "no customizations found for this workspace.": "该工作区未发现自定义项。",
     "no customizations found for this workspace": "该工作区未发现自定义项",
@@ -662,6 +668,28 @@ try {
     { pattern: /Stopped\\s+after\\s+(\\d+)d/gi, replace: "运行 $1 天后停止" },
     { pattern: /Stopped\\s+after\\s+(.+)/gi, replace: "运行 $1 后停止" }
   ];
+
+  globalThis.__antigravity_translate = function(text) {
+    if (!text) return text;
+    const key = text.trim().toLowerCase();
+    
+    // 精确字典翻译
+    if (translationDict[key]) {
+      return translationDict[key];
+    }
+    
+    // 正则表达式替换
+    let temp = text;
+    let modified = false;
+    for (const item of regexReplacements) {
+      const newText = temp.replace(item.pattern, item.replace);
+      if (newText !== temp) {
+        temp = newText;
+        modified = true;
+      }
+    }
+    return modified ? temp : text;
+  };
 
   function shouldSkipNode(node) {
     let current = node;
@@ -812,8 +840,20 @@ try {
 // ==================== END OF L10N PATCH ====================
 `;
 
+  let preloadContent = fs.readFileSync(preloadPath, 'utf8');
+  preloadContent = preloadContent.replace(
+    "send: (options) => electron_1.ipcRenderer.invoke('notification:send', options),",
+    `send: (options) => {
+        if (options && globalThis.__antigravity_translate) {
+            if (options.title) options.title = globalThis.__antigravity_translate(options.title);
+            if (options.body) options.body = globalThis.__antigravity_translate(options.body);
+        }
+        return electron_1.ipcRenderer.invoke('notification:send', options);
+    },`
+  );
+  fs.writeFileSync(preloadPath, preloadContent, 'utf8');
   fs.appendFileSync(preloadPath, l10nCode);
-  console.log('preload.js 注入完成。');
+  console.log('preload.js 注入与通知处理拦截完成。');
 
   // 7. 修改 menu.js 中的硬编码菜单项
   console.log('正在修改 menu.js 中的自定义硬编码项...');
