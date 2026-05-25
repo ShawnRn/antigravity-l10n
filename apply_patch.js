@@ -82,7 +82,7 @@ try {
 
     // 基础导航
     "antigravity": "Antigravity",
-    "task": "任务",
+    "task": "任务清单",
     "settings": "设置",
     "implementation plan": "实施计划",
     "walkthrough": "演示与回顾",
