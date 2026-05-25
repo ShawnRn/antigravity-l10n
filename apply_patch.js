@@ -453,12 +453,18 @@ try {
     "cancelled": "已取消",
     "timer has expired": "定时器已过期",
     "timer": "定时器",
-    "expired": "已过期"
+    "expired": "已过期",
+    "compacting": "正在压缩",
+    "compacting...": "正在压缩...",
+    "compacted": "已压缩"
   };
 
   // 仅对长而唯一的短语使用正则替换，避免污染普通单词（如 App, Open, File）
   const regexReplacements = [
     { pattern: /Open IDE/gi, replace: "打开 IDE" },
+    { pattern: /Compacting\\.\\.\\./gi, replace: "正在压缩..." },
+    { pattern: /Compacting/gi, replace: "正在压缩" },
+    { pattern: /Compacted/gi, replace: "已压缩" },
     { pattern: /New Conversation/gi, replace: "新建会话" },
     { pattern: /Conversation History/gi, replace: "会话历史" },
     { pattern: /Scheduled Tasks/gi, replace: "定时任务" },
