@@ -55,6 +55,7 @@ try {
   const l10nCode = `
 // ==================== ANTIGRAVITY L10N PATCH ====================
 (function() {
+  try {
 
   // 使用全小写作为键，实现大小写不敏感的高鲁棒性匹配
   const translationDict = {
@@ -643,6 +644,10 @@ try {
     { pattern: /(\\d+)\\s+pages?/gi, replace: "$1 个页面" },
     { pattern: /(\\d+)\\s+urls?/gi, replace: "$1 个 URL" },
     { pattern: /(\\d+)\\s+tabs?/gi, replace: "$1 个标签页" },
+    // === 针对通用的数值+单词组合 ===
+    { pattern: /(\\d+)\\s+files?/gi, replace: "$1 个文件" },
+    { pattern: /(\\d+)\\s+searches?/gi, replace: "$1 次搜索" },
+    { pattern: /(\\d+)\\s+results?/gi, replace: "$1 个结果" },
     // === 针对 timed check 等时态 ===
     { pattern: /Timed\\s+checked\\s+for\\s+(\\d+)s/gi, replace: "定时检查了 $1 秒" },
     { pattern: /Timed\\s+checking\\s+for\\s+(\\d+)s/gi, replace: "定时检查中 ($1 秒)" },
@@ -800,6 +805,9 @@ try {
     subtree: true,
     characterData: true
   });
+  } catch (err) {
+    console.error('[L10N] Preload runtime error:', err);
+  }
 })();
 // ==================== END OF L10N PATCH ====================
 `;
