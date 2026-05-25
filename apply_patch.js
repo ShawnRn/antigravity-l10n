@@ -510,7 +510,21 @@ try {
     "see our": "请参阅我们的",
     "see our ": "请参阅我们的",
     "for more help.": "以获取更多帮助。",
-    "for more help": "以获取更多帮助"
+    "for more help": "以获取更多帮助",
+
+    // 新增的工作区无自定义提示 (No customizations found for workspace)
+    "no customizations found for this workspace.": "该工作区未发现自定义项。",
+    "no customizations found for this workspace": "该工作区未发现自定义项",
+    
+    // 反馈与确认按钮 (Feedback & Confirmation tooltips/buttons)
+    "copy": "复制",
+    "good response": "好评",
+    "bad response": "差评",
+    "copied!": "已复制！",
+    "copied": "已复制",
+    "ok": "确定",
+    "confirm": "确认",
+    "done": "完成"
   };
 
   // 仅对长而唯一的短语使用正则替换，避免污染普通单词（如 App, Open, File）
