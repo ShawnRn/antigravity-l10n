@@ -321,6 +321,10 @@ try {
     "within it. this action cannot be undone.": "。此操作无法撤销。",
     "within it. this action cannot be undone": "。此操作无法撤销。",
     "all conversations": "所有会话",
+    "run": "运行",
+    "timer:": "定时器:",
+    "prompt:": "提示词:",
+    "tasks running": "个任务正在运行",
     "danger zone": "危险区域",
     "delete project": "删除项目",
     "permanently delete this project and all of its conversations.": "永久删除此项目及其所有会话。",
@@ -516,6 +520,9 @@ try {
     { pattern: /Edited\\s+([a-zA-Z]{1,4})\\s+(.+)/gi, replace: "编辑了 $1 文件 $2" },
     { pattern: /Edited\\s+(.+)/gi, replace: "编辑了 $1" },
     { pattern: /Ran\\s+(.+)/gi, replace: "执行了命令 $1" },
+    { pattern: /Run\\s+(.+)/gi, replace: "运行命令 $1" },
+    { pattern: /Running\\s+(.+)/gi, replace: "正在运行命令 $1" },
+    { pattern: /Running\\.\\.\\./gi, replace: "正在运行..." },
     { pattern: /Are you sure you want to delete the project (.+)\\?/gi, replace: "您确定要删除项目 $1 吗？" },
     { pattern: /Are you sure you want to delete the project/gi, replace: "您确定要删除项目 " },
     { pattern: /This will permanently delete the project and/gi, replace: "这将永久删除该项目及" },
@@ -551,7 +558,17 @@ try {
     { pattern: /Timer has expired/gi, replace: "定时器已过期" },
     { pattern: /Timed (\\d+) seconds?/gi, replace: "定时了 $1 秒" },
     { pattern: /Timed (\\d+) minutes?/gi, replace: "定时了 $1 分钟" },
-    { pattern: /Timed (\\d+) hours?/gi, replace: "定时了 $1 小时" }
+    { pattern: /Timed (\\d+) hours?/gi, replace: "定时了 $1 小时" },
+    // === 针对 tasks running ===
+    { pattern: /(\\d+)\\s+tasks?\\s+running/gi, replace: "$1 个任务正在运行" },
+    { pattern: /No tasks running/gi, replace: "无运行中的任务" },
+    // === 针对 Timer 任务列表项 ===
+    { pattern: /Timer:\\s*(\\d+)s,\\s*Prompt:\\s*/gi, replace: "定时器: $1秒, 提示词: " },
+    { pattern: /Timer:\\s*(\\d+)m,\\s*Prompt:\\s*/gi, replace: "定时器: $1分钟, 提示词: " },
+    { pattern: /Timer:\\s*(\\d+)h,\\s*Prompt:\\s*/gi, replace: "定时器: $1小时, 提示词: " },
+    { pattern: /Timer:\\s*(\\d+)s/gi, replace: "定时器: $1秒" },
+    { pattern: /Timer:\\s*(\\d+)m/gi, replace: "定时器: $1分钟" },
+    { pattern: /Timer:\\s*(\\d+)h/gi, replace: "定时器: $1小时" }
   ];
 
   function shouldSkipNode(node) {
@@ -567,7 +584,15 @@ try {
           current.classList.contains('cm-editor') ||
           current.classList.contains('code-block') ||
           current.classList.contains('code') ||
-          current.classList.contains('no-translate')
+          current.classList.contains('no-translate') ||
+          current.classList.contains('thought-body') ||
+          current.classList.contains('thought-content') ||
+          current.classList.contains('thought-details') ||
+          current.classList.contains('thinking-details') ||
+          current.classList.contains('thinking-content') ||
+          current.classList.contains('thought-text') ||
+          current.classList.contains('thoughts') ||
+          current.classList.contains('thinking')
         )) {
           return true;
         }
