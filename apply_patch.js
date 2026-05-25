@@ -423,6 +423,7 @@ try {
     "artifacts": "交付物",
     "artifact": "交付物",
     "background tasks": "后台任务",
+    "background task output": "后台任务输出",
     "today": "今天",
     "yesterday": "昨天",
     "am": "上午",
@@ -470,6 +471,7 @@ try {
   // 仅对长而唯一的短语使用正则替换，避免污染普通单词（如 App, Open, File）
   const regexReplacements = [
     { pattern: /Open IDE/gi, replace: "打开 IDE" },
+    { pattern: /Background Task Output/gi, replace: "后台任务输出" },
     { pattern: /Compacting\\.\\.\\./gi, replace: "正在压缩..." },
     { pattern: /Compacting/gi, replace: "正在压缩" },
     { pattern: /Compacted/gi, replace: "已压缩" },
