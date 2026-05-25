@@ -73,6 +73,11 @@ try {
     "welcome to": "欢迎来到",
     "authentication required": "需要身份验证",
     "open settings": "打开设置",
+    "awaiting authentication...": "等待身份验证...",
+    "awaiting authentication": "等待身份验证",
+    "use google cloud project instead": "改用 Google Cloud 项目",
+    "previous": "返回",
+    "continue": "继续",
 
     // 基础导航
     "antigravity": "Antigravity",
@@ -465,7 +470,33 @@ try {
     "expired": "已过期",
     "compacting": "正在压缩",
     "compacting...": "正在压缩...",
-    "compacted": "已压缩"
+    "compacted": "已压缩",
+    "stopped after": "运行后停止",
+
+    // 通知与弹窗偏好设置 (Notification preferences)
+    "notification preferences": "通知偏好",
+    "choose whether to be notified when the agent needs your attention or completes a task.": "选择当智能体需要您的关注或完成任务时是否接收通知。",
+    "dismiss": "忽略",
+    "open preferences": "打开偏好设置",
+
+    // 安全预设详情 (Security preset details)
+    "default": "默认",
+    "requires manual review for all terminal commands and file accesses outside of the working folders.": "对工作区文件夹外的所有终端命令和文件访问均需要人工审查。",
+    "full machine": "整机",
+    "all terminal commands require review. the agent can read or write to any file in the machine.": "所有终端命令均需要人工审查。智能体可以读写该机器上的任意文件。",
+    "disables all safety barriers for maximal iteration velocity.": "禁用所有安全屏障以获得最高的迭代速度。",
+    "manually customize individual settings.": "手动自定义各子项设置。",
+
+    // 智能体终止与错误提示 (Agent termination & error message)
+    "agent terminated due to error": "智能体由于错误已终止",
+    "see our troubleshooting guide for more help.": "查看我们的故障排除指南以获得更多帮助。",
+    "troubleshooting guide": "故障排除指南",
+    "copy debug info": "复制调试信息",
+    "retry": "重试",
+    "you can prompt the model to try again or start a": "您可以提示模型重试，或者",
+    "you can prompt the model to try again or start a ": "您可以提示模型重试，或者",
+    "if the error persists.": "（如果错误仍然存在）。",
+    "you can prompt the model to try again or start a new conversation if the error persists.": "如果错误持续存在，您可以提示模型重试或开启一个新的会话。"
   };
 
   // 仅对长而唯一的短语使用正则替换，避免污染普通单词（如 App, Open, File）
@@ -583,7 +614,13 @@ try {
     { pattern: /Timed\\s+check\\s+for\\s+(\\d+)s/gi, replace: "定时检查 ($1 秒)" },
     { pattern: /Timed\\s+checked/gi, replace: "已定时检查" },
     { pattern: /Timed\\s+checking/gi, replace: "正在定时检查" },
-    { pattern: /Timed\\s+check/gi, replace: "定时检查" }
+    { pattern: /Timed\\s+check/gi, replace: "定时检查" },
+    // === 针对 Stopped after 运行后停止 ===
+    { pattern: /Stopped\\s+after\\s+(\\d+)s/gi, replace: "运行 $1 秒后停止" },
+    { pattern: /Stopped\\s+after\\s+(\\d+)m/gi, replace: "运行 $1 分钟后停止" },
+    { pattern: /Stopped\\s+after\\s+(\\d+)h/gi, replace: "运行 $1 小时后停止" },
+    { pattern: /Stopped\\s+after\\s+(\\d+)d/gi, replace: "运行 $1 天后停止" },
+    { pattern: /Stopped\\s+after\\s+(.+)/gi, replace: "运行 $1 后停止" }
   ];
 
   function shouldSkipNode(node) {
