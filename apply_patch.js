@@ -105,6 +105,8 @@ try {
     "mark as read": "标记为已读",
     "rename": "重命名",
     "delete conversation": "删除会话",
+    "new conversation in project": "在项目中新建会话",
+    "project settings": "项目设置",
     
     // 设置侧边栏标签
     "account": "账户",
