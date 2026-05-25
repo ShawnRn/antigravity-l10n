@@ -337,6 +337,7 @@ try {
     'show "edit" and "chat" buttons when selecting text in the editor.': "在编辑器中选择文本时，显示“编辑”和“聊天”按钮。",
     "to modify editor settings, open settings within the editor window.": "要修改编辑器设置，请在编辑器窗口中打开“设置”。",
     "open editor settings": "打开编辑器设置",
+    "open ide": "打开 IDE",
     "configure the browser subagent. it requires": "配置浏览器子智能体。它需要",
     "to be installed. the browser subagent can be invoked by typing /browser in the conversation input box.": "已安装。可以在会话输入框中输入 /browser 启动浏览器子智能体。",
     "manage your notification preferences.": "管理您的通知偏好。",
@@ -457,6 +458,7 @@ try {
 
   // 仅对长而唯一的短语使用正则替换，避免污染普通单词（如 App, Open, File）
   const regexReplacements = [
+    { pattern: /Open IDE/gi, replace: "打开 IDE" },
     { pattern: /New Conversation/gi, replace: "新建会话" },
     { pattern: /Conversation History/gi, replace: "会话历史" },
     { pattern: /Scheduled Tasks/gi, replace: "定时任务" },
