@@ -433,6 +433,9 @@ try {
     "ran": "执行了",
     "thought": "思考了",
     "worked": "工作了",
+    "timed checked": "已定时检查",
+    "timed checking": "正在定时检查",
+    "timed check": "定时检查",
     "working": "正在执行",
     "working..": "正在执行..",
     "working...": "正在执行...",
@@ -568,7 +571,16 @@ try {
     { pattern: /Timer:\\s*(\\d+)h,\\s*Prompt:\\s*/gi, replace: "定时器: $1小时, 提示词: " },
     { pattern: /Timer:\\s*(\\d+)s/gi, replace: "定时器: $1秒" },
     { pattern: /Timer:\\s*(\\d+)m/gi, replace: "定时器: $1分钟" },
-    { pattern: /Timer:\\s*(\\d+)h/gi, replace: "定时器: $1小时" }
+    { pattern: /Timer:\\s*(\\d+)h/gi, replace: "定时器: $1小时" },
+    // === 针对 files changed ===
+    { pattern: /(\\d+)\\s+files?\\s+changed/gi, replace: "$1 个文件已修改" },
+    // === 针对 timed check 等时态 ===
+    { pattern: /Timed\\s+checked\\s+for\\s+(\\d+)s/gi, replace: "定时检查了 $1 秒" },
+    { pattern: /Timed\\s+checking\\s+for\\s+(\\d+)s/gi, replace: "定时检查中 ($1 秒)" },
+    { pattern: /Timed\\s+check\\s+for\\s+(\\d+)s/gi, replace: "定时检查 ($1 秒)" },
+    { pattern: /Timed\\s+checked/gi, replace: "已定时检查" },
+    { pattern: /Timed\\s+checking/gi, replace: "正在定时检查" },
+    { pattern: /Timed\\s+check/gi, replace: "定时检查" }
   ];
 
   function shouldSkipNode(node) {
