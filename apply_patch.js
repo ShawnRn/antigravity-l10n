@@ -700,22 +700,23 @@ try {
         if (tagName === 'pre' || tagName === 'code' || tagName === 'textarea' || tagName === 'script' || tagName === 'style') {
           return true;
         }
-        if (current.classList && (
-          current.classList.contains('monaco-editor') ||
-          current.classList.contains('cm-editor') ||
-          current.classList.contains('code-block') ||
-          current.classList.contains('code') ||
-          current.classList.contains('no-translate') ||
-          current.classList.contains('thought-body') ||
-          current.classList.contains('thought-content') ||
-          current.classList.contains('thought-details') ||
-          current.classList.contains('thinking-details') ||
-          current.classList.contains('thinking-content') ||
-          current.classList.contains('thought-text') ||
-          current.classList.contains('thoughts') ||
-          current.classList.contains('thinking')
-        )) {
-          return true;
+        if (current.classList) {
+          if (
+            current.classList.contains('monaco-editor') ||
+            current.classList.contains('cm-editor') ||
+            current.classList.contains('code-block') ||
+            current.classList.contains('code') ||
+            current.classList.contains('no-translate')
+          ) {
+            return true;
+          }
+          // 模糊匹配：若类名包含 thought 或 thinking，则判断为模型思考区，跳过翻译以防误伤
+          for (let i = 0; i < current.classList.length; i++) {
+            const cls = current.classList[i].toLowerCase();
+            if (cls.includes('thought') || cls.includes('thinking')) {
+              return true;
+            }
+          }
         }
         if (current.getAttribute('contenteditable') === 'true') {
           return true;
