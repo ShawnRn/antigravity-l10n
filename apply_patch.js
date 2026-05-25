@@ -652,7 +652,8 @@ try {
     { pattern: /(\\d+)\\s+tabs?/gi, replace: "$1 个标签页" },
     // === 针对通用的数值+单词组合 ===
     { pattern: /(\\d+)\\s+files?/gi, replace: "$1 个文件" },
-    { pattern: /(\\d+)\\s+searches?/gi, replace: "$1 次搜索" },
+    { pattern: /(\\d+)\\s+folders?/gi, replace: "$1 个文件夹" },
+    { pattern: /(\\d+)\\s+search(es)?/gi, replace: "$1 次搜索" },
     { pattern: /(\\d+)\\s+results?/gi, replace: "$1 个结果" },
     // === 针对 timed check 等时态 ===
     { pattern: /Timed\\s+checked\\s+for\\s+(\\d+)s/gi, replace: "定时检查了 $1 秒" },
