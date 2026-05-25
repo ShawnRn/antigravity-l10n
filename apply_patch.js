@@ -97,6 +97,14 @@ try {
     "not in project": "未关联项目",
     "shortcuts": "快捷键",
     "provide feedback": "提供反馈",
+    "pin conversation": "置顶会话",
+    "unpin conversation": "取消置顶会话",
+    "archive conversation": "归档会话",
+    "unarchive conversation": "取消归档会话",
+    "mark as unread": "标记为未读",
+    "mark as read": "标记为已读",
+    "rename": "重命名",
+    "delete conversation": "删除会话",
     
     // 设置侧边栏标签
     "account": "账户",
