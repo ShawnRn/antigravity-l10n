@@ -522,6 +522,10 @@ try {
     "task completed": "任务已完成",
     "the agent has completed the task.": "智能体已完成任务。",
 
+    // 请求终端权限通知 (Requesting terminal permission notification)
+    "requesting your permission in terminal:": "请求执行终端命令的权限：",
+    "requesting your permission in terminal": "请求执行终端命令的权限",
+
     // 新增的工作区无自定义提示 (No customizations found for workspace)
     "no customizations found for this workspace.": "该工作区未发现自定义项。",
     "no customizations found for this workspace": "该工作区未发现自定义项",
@@ -534,7 +538,68 @@ try {
     "copied": "已复制",
     "ok": "确定",
     "confirm": "确认",
-    "done": "完成"
+    "done": "完成",
+
+    // 搜索结果计数汉化 (Search result counts)
+    "result": "个结果",
+    "results": "个结果",
+    "1 result": "1 个结果",
+    "2 results": "2 个结果",
+
+    // 权限请求确认与选项 (Permission Request Prompt & Options)
+    "allow running this command?": "是否允许运行此命令？",
+    "yes, allow this time": "是的，仅允许这一次",
+    "no (tell the agent what to do instead)": "拒绝（告诉智能体该做什么）",
+    "allow reading this file?": "是否允许读取此文件？",
+    "allow writing to this file?": "是否允许写入此文件？",
+    "allow reading this directory?": "是否允许读取此目录？",
+    "allow writing to this directory?": "是否允许写入此目录？",
+    "yes, and always allow reading in this project": "是的，并且在此项目中始终允许读取",
+    "yes, and always allow reading": "是的，且始终允许读取",
+    "yes, and always allow writing in this project": "是的，并且在此项目中始终允许写入",
+    "yes, and always allow writing": "是的，且始终允许写入",
+
+    // Media (媒体) 汉化
+    "media": "媒体",
+
+    // 新建定时任务弹窗 (New Scheduled Task dialog)
+    "new scheduled task": "新建定时任务",
+    "name": "名称",
+    "enter task name": "输入任务名称",
+    "schedule": "计划",
+    "around": "约",
+    "prompt": "提示词",
+    "enter a prompt for the agent": "输入智能体的提示词",
+    "add scheduled task": "添加定时任务",
+    "search tasks...": "搜索任务...",
+    "search tasks": "搜索任务",
+    "all tasks run as flash.": "所有任务以 Flash 模式运行。",
+    "all tasks run as flash": "所有任务以 Flash 模式运行",
+
+    // 定时任务频率选项 (Schedule frequency options)
+    "daily": "每天",
+    "weekly": "每周",
+    "monthly": "每月",
+    "hourly": "每小时",
+    "weekdays": "工作日",
+    "weekends": "周末",
+    "every day": "每天",
+    "every week": "每周",
+    "every month": "每月",
+    "every hour": "每小时",
+
+    // 定时任务状态 (Scheduled task status)
+    "next run": "下次运行",
+    "last run": "上次运行",
+    "no tasks yet": "暂无任务",
+    "no scheduled tasks": "暂无定时任务",
+    "delete task": "删除任务",
+    "edit task": "编辑任务",
+    "enable task": "启用任务",
+    "disable task": "禁用任务",
+    "task enabled": "任务已启用",
+    "task disabled": "任务已禁用",
+    "task deleted": "任务已删除"
   };
 
   // 仅对长而唯一的短语使用正则替换，避免污染普通单词（如 App, Open, File）
@@ -595,6 +660,9 @@ try {
     { pattern: /Edited\\s+([a-zA-Z]{1,4})\\s+(.+)/gi, replace: "编辑了 $1 文件 $2" },
     { pattern: /Edited\\s+(.+)/gi, replace: "编辑了 $1" },
     { pattern: /Ran\\s+(.+)/gi, replace: "执行了命令 $1" },
+    // 精确匹配 "All tasks run as Flash." 须置于通用 Run 规则之前
+    { pattern: /All tasks run as Flash\\./gi, replace: "所有任务以 Flash 模式运行。" },
+    { pattern: /All tasks run as Flash/gi, replace: "所有任务以 Flash 模式运行" },
     { pattern: /Run\\s+(.+)/gi, replace: "运行命令 $1" },
     { pattern: /Running\\s+(.+)/gi, replace: "正在运行命令 $1" },
     { pattern: /Running\\.\\.\\./gi, replace: "正在运行..." },
@@ -634,6 +702,9 @@ try {
     { pattern: /Timed (\\d+) seconds?/gi, replace: "定时了 $1 秒" },
     { pattern: /Timed (\\d+) minutes?/gi, replace: "定时了 $1 分钟" },
     { pattern: /Timed (\\d+) hours?/gi, replace: "定时了 $1 小时" },
+    { pattern: /Waiting (\\d+) seconds?/gi, replace: "等待 $1 秒" },
+    { pattern: /Waiting (\\d+) minutes?/gi, replace: "等待 $1 分钟" },
+    { pattern: /Waiting (\\d+) hours?/gi, replace: "等待 $1 小时" },
     // === 针对 tasks running ===
     { pattern: /(\\d+)\\s+tasks?\\s+running/gi, replace: "$1 个任务正在运行" },
     { pattern: /No tasks running/gi, replace: "无运行中的任务" },
@@ -667,12 +738,17 @@ try {
     { pattern: /Stopped\\s+after\\s+(\\d+)m/gi, replace: "运行 $1 分钟后停止" },
     { pattern: /Stopped\\s+after\\s+(\\d+)h/gi, replace: "运行 $1 小时后停止" },
     { pattern: /Stopped\\s+after\\s+(\\d+)d/gi, replace: "运行 $1 天后停止" },
-    { pattern: /Stopped\\s+after\\s+(.+)/gi, replace: "运行 $1 后停止" }
+    { pattern: /Stopped\\s+after\\s+(.+)/gi, replace: "运行 $1 后停止" },
+    // === 针对权限请求动态选项 (Permission Request Options) ===
+    { pattern: /Yes, and always allow (.+?) in this project/gi, replace: "是的，并且在此项目中始终允许 $1" },
+    { pattern: /Yes, and always allow (.+)/gi, replace: "是的，并且始终允许 $1" },
+    // === 针对通知中的 Command: 前缀 ===
+    { pattern: /^Command:\\s*/gi, replace: "命令：" }
   ];
 
   globalThis.__antigravity_translate = function(text) {
     if (!text) return text;
-    const key = text.trim().toLowerCase();
+    const key = text.trim().toLowerCase().replace(/\s+/g, ' ');
     
     // 精确字典翻译
     if (translationDict[key]) {
@@ -961,6 +1037,54 @@ try {
       .replace("label: 'Quit',", "label: '退出',");
     fs.writeFileSync(mainJsPath, content, 'utf8');
     console.log('main.js 修改完成。');
+  }
+
+  // 9c. 修改 ipcHandlers.js 中的通知发送逻辑以在主进程汉化系统通知
+  console.log('正在修改 ipcHandlers.js 中的通知发送逻辑...');
+  const ipcHandlersPath = path.join(tempDir, 'dist/ipcHandlers.js');
+  if (fs.existsSync(ipcHandlersPath)) {
+    let content = fs.readFileSync(ipcHandlersPath, 'utf8');
+    const mainTranslateCode = `
+    const mainTranslationDict = {
+        "action requires your attention": "操作需要您的关注",
+        "the agent is waiting for your input.": "智能体正在等待您的输入。",
+        "task completed": "任务已完成",
+        "the agent has completed the task.": "智能体已完成任务。",
+        "requesting your permission in terminal:": "请求执行终端命令的权限：",
+        "requesting your permission in terminal": "请求执行终端命令的权限"
+    };
+    const mainRegexReplacements = [
+        { pattern: /^Command:\\\\s*/gi, replace: "命令：" }
+    ];
+    function mainTranslate(text) {
+        if (!text) return text;
+        const key = text.trim().toLowerCase().replace(/\\s+/g, ' ');
+        if (mainTranslationDict[key]) {
+            return mainTranslationDict[key];
+        }
+        let temp = text;
+        let modified = false;
+        for (const item of mainRegexReplacements) {
+            const newText = temp.replace(item.pattern, item.replace);
+            if (newText !== temp) {
+                temp = newText;
+                modified = true;
+            }
+        }
+        return modified ? temp : text;
+    }
+    `;
+    content = content.replace(
+      "electron_1.ipcMain.handle('notification:send', (_, options) => {",
+      `${mainTranslateCode}
+    electron_1.ipcMain.handle('notification:send', (_, options) => {
+        if (options) {
+            if (options.title) options.title = mainTranslate(options.title);
+            if (options.body) options.body = mainTranslate(options.body);
+        }`
+    );
+    fs.writeFileSync(ipcHandlersPath, content, 'utf8');
+    console.log('ipcHandlers.js 修改完成。');
   }
 
   // 10. 使用 npx 打包为 app.asar
