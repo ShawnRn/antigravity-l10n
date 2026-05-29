@@ -174,6 +174,11 @@ try {
     "artifact review policy": "Artifact 审查策略",
     "always ask": "每次询问",
     "always proceed": "总是继续",
+    "auto-proceeded with": "已自动继续",
+    "auto-proceeding with": "正在自动继续",
+    "auto-proceeded": "已自动继续",
+    "auto-proceeding": "正在自动继续",
+    "auto-proceed": "自动继续",
     "specifies agent's behavior when asking for review on artifacts, which are documents it creates to enable a richer conversation experience.": "指定智能体在请求审查 Artifact 时（即它为提供更丰富的对话体验而创建的文档）的行为。",
     "local permissions": "本地权限",
     "file access rules": "文件访问规则",
@@ -722,10 +727,13 @@ try {
     { pattern: /(\\d+)\\s+urls?/gi, replace: "$1 个 URL" },
     { pattern: /(\\d+)\\s+tabs?/gi, replace: "$1 个标签页" },
     // === 针对通用的数值+单词组合 ===
+    { pattern: /(\\d+)\\s+artifacts?/gi, replace: "$1 个交付物" },
     { pattern: /(\\d+)\\s+files?/gi, replace: "$1 个文件" },
     { pattern: /(\\d+)\\s+folders?/gi, replace: "$1 个文件夹" },
     { pattern: /(\\d+)\\s+search(es)?/gi, replace: "$1 次搜索" },
     { pattern: /(\\d+)\\s+results?/gi, replace: "$1 个结果" },
+    { pattern: /Auto-proceeded with/gi, replace: "已自动继续" },
+    { pattern: /Auto-proceeding with/gi, replace: "正在自动继续" },
     // === 针对 timed check 等时态 ===
     { pattern: /Timed\\s+checked\\s+for\\s+(\\d+)s/gi, replace: "定时检查了 $1 秒" },
     { pattern: /Timed\\s+checking\\s+for\\s+(\\d+)s/gi, replace: "定时检查中 ($1 秒)" },
@@ -786,10 +794,17 @@ try {
           ) {
             return true;
           }
-          // 模糊匹配：若类名包含 thought 或 thinking，则判断为模型思考区，跳过翻译以防误伤
+          // 模糊匹配：若类名包含 thought/thinking/message/bubble/markdown/prompt，则属于会话内容或思考区，跳过翻译
           for (let i = 0; i < current.classList.length; i++) {
             const cls = current.classList[i].toLowerCase();
-            if (cls.includes('thought') || cls.includes('thinking')) {
+            if (
+              cls.includes('thought') ||
+              cls.includes('thinking') ||
+              cls.includes('message') ||
+              cls.includes('bubble') ||
+              cls.includes('markdown') ||
+              cls.includes('prompt')
+            ) {
               return true;
             }
           }
