@@ -604,159 +604,120 @@ try {
     "disable task": "禁用任务",
     "task enabled": "任务已启用",
     "task disabled": "任务已禁用",
-    "task deleted": "任务已删除"
+    "task deleted": "任务已删除",
+    "the conversation was compacted to fit within the context window.": "会话已压缩以适应上下文窗口。",
+    "the conversation was compacted while generating this response.": "在生成此回复时，会话已被压缩。",
+    "the conversation was compacted to fit within the context window": "会话已压缩以适应上下文窗口",
+    "the conversation was compacted while generating this response": "在生成此回复时，会话已被压缩"
   };
 
   // 仅对长而唯一的短语使用正则替换，避免污染普通单词（如 App, Open, File）
   const regexReplacements = [
-    { pattern: /Open IDE/gi, replace: "打开 IDE" },
-    { pattern: /Background Task Output/gi, replace: "后台任务输出" },
-    { pattern: /Compacting\\.\\.\\./gi, replace: "正在压缩..." },
-    { pattern: /Compacting/gi, replace: "正在压缩" },
-    { pattern: /Compacted/gi, replace: "已压缩" },
-    { pattern: /New Conversation/gi, replace: "新建会话" },
-    { pattern: /Conversation History/gi, replace: "会话历史" },
-    { pattern: /Scheduled Tasks/gi, replace: "定时任务" },
-    { pattern: /No conversations yet/gi, replace: "暂无会话" },
-    { pattern: /Antigravity Settings/gi, replace: "Antigravity 设置" },
-    { pattern: /Manage your plan, credentials, and general preferences\\./gi, replace: "管理您的计划、凭证和通用偏好。" },
-    { pattern: /Manage project folders, agent settings, and permissions\\./gi, replace: "管理项目文件夹、智能体设置与权限。" },
-    { pattern: /No folders added yet\\./gi, replace: "尚未添加任何文件夹。" },
-    { pattern: /Choose a predefined security preset for the agent\\. This controls terminal auto-execution policy, and file access policy\\./gi, replace: "为智能体选择预设的安全级别。这控制了终端自动执行策略和文件访问策略。" },
-    { pattern: /Specifies Agent's behavior when asking for review on artifacts, which are documents it creates to enable a richer conversation experience\\./gi, replace: "指定智能体在请求审查 Artifact 时（即它为提供更丰富的对话体验而创建的文档）的行为。" },
-    { pattern: /Configure allowed and denied paths for file reads and writes\\./gi, replace: "配置允许和拒绝文件读写的路径。" },
-    { pattern: /Configure allowed and denied URLs for reading\\./gi, replace: "配置允许和拒绝读取的 URL。" },
-    { pattern: /Local permissions have higher priority\\./gi, replace: "本地权限具有更高的优先级。" },
-    { pattern: /Configure the agent's visual theme and display preferences\\./gi, replace: "配置智能体的视觉主题与显示偏好。" },
-    { pattern: /Display and preserve intermediate thinking steps/gi, replace: "显示并保留中间思考步骤" },
-    { pattern: /Configure global allowed and denied resource permissions\\./gi, replace: "配置全局允许和拒绝的资源权限。" },
-    { pattern: /Configures how the agent tries to access files outside of its working folders\\./gi, replace: "配置智能体如何尝试访问其工作文件夹之外的文件。" },
-    { pattern: /Controls whether terminal commands require your approval before running\\./gi, replace: "控制终端命令在运行前是否需要您的批准。" },
-    { pattern: /Restricts agent tools to a secure, isolated local sandbox\\./gi, replace: "限制智能体工具在安全、隔离的本地沙箱中运行。" },
-    { pattern: /Manage application settings\\./gi, replace: "管理应用设置。" },
-    { pattern: /Prevent the computer from sleeping while the app is running\\./gi, replace: "在应用运行时防止计算机进入休眠状态。" },
-    { pattern: /The app will be accessible from the menu bar and will keep running in the background when all windows are closed\\./gi, replace: "该应用可从菜单栏访问，并在所有窗口关闭时在后台继续运行。" },
-    { pattern: /To modify notification settings, open your operating system's system preferences\\./gi, replace: "要修改通知设置，请打开您操作系统的系统偏好设置。" },
-    { pattern: /Configure the browser subagent\\. It requires Google Chrome to be installed\\. The browser subagent can be invoked by typing \\/browser in the conversation input box\\./gi, replace: "配置浏览器子智能体。它需要安装 Google Chrome。可以在会话输入框中输入 /browser 启动浏览器子智能体。" },
-    { pattern: /Controls whether the agent can run custom JavaScript to automate complex browser actions\\./gi, replace: "控制智能体是否可以运行自定义 JavaScript 以自动化复杂的浏览器操作。" },
-    { pattern: /Configure allowed and denied URLs for browser actuation\\./gi, replace: "配置允许和拒绝进行浏览器操作的 URL 规则。" },
-    { pattern: /Agent settings and permissions for conversations outside of projects\\./gi, replace: "针对项目外对话的智能体设置与权限。" },
-    { pattern: /Rules: (\\d+) tokens/gi, replace: "规则: $1 字节 (tokens)" },
-    { pattern: /Skills: (\\d+) tokens/gi, replace: "技能: $1 字节 (tokens)" },
-    { pattern: /Workflows: (\\d+) tokens/gi, replace: "工作流: $1 字节 (tokens)" },
-    { pattern: /Show (\\d+) breakdowns?/gi, replace: "显示 $1 个细分" },
-    { pattern: /(\\d+)% remaining/gi, replace: "剩余 $1%" },
-    { pattern: /Refreshes in (\\d+) hours?, (\\d+) minutes?/gi, replace: "在 $1 小时 $2 分钟后刷新" },
-    { pattern: /See all \\((\\d+)\\)/gi, replace: "查看全部 ($1)" },
-    { pattern: /^\\s*(\\d+)s\\s*$/g, replace: "$1秒前" },
-    { pattern: /^\\s*(\\d+)m\\s*$/g, replace: "$1分钟前" },
-    { pattern: /^\\s*(\\d+)h\\s*$/g, replace: "$1小时前" },
-    { pattern: /^\\s*(\\d+)d\\s*$/g, replace: "$1天前" },
-    { pattern: /^\\s*(\\d+)w\\s*$/g, replace: "$1周前" },
-    { pattern: /^\\s*(\\d+)mo\\s*$/g, replace: "$1个月前" },
-    { pattern: /^\\s*(\\d+)y\\s*$/g, replace: "$1年前" },
-    { pattern: /A high-risk mode that disables all safety barriers\\. The agent operates with full system access, auto-executes all terminal commands, and reads or writes to all local files without review prompts\\./gi, replace: "一种禁用所有安全屏障的高风险模式。智能体运行于完整的系统访问权限下，自动执行所有终端命令，读写所有本地文件时均无需审查提示。" },
-    { pattern: /Today (\\d+:\\d+)\\s*AM/gi, replace: "今天上午 $1" },
-    { pattern: /Today (\\d+:\\d+)\\s*PM/gi, replace: "今天下午 $1" },
-    { pattern: /Yesterday (\\d+:\\d+)\\s*AM/gi, replace: "昨天上午 $1" },
-    { pattern: /Yesterday (\\d+:\\d+)\\s*PM/gi, replace: "昨天下午 $1" },
-    { pattern: /Thought for (\\d+)s?/gi, replace: "思考了 $1 秒" },
-    { pattern: /Explored (\\d+) files?/gi, replace: "探索了 $1 个文件" },
-    { pattern: /Edited\\s+([a-zA-Z]{1,4})\\s+(.+)/gi, replace: "编辑了 $1 文件 $2" },
-    { pattern: /Edited\\s+(.+)/gi, replace: "编辑了 $1" },
-    { pattern: /Ran\\s+(.+)/gi, replace: "执行了命令 $1" },
-    // 精确匹配 "All tasks run as Flash." 须置于通用 Run 规则之前
-    { pattern: /All tasks run as Flash\\./gi, replace: "所有任务以 Flash 模式运行。" },
-    { pattern: /All tasks run as Flash/gi, replace: "所有任务以 Flash 模式运行" },
-    { pattern: /Run\\s+(.+)/gi, replace: "运行命令 $1" },
-    { pattern: /Running\\s+(.+)/gi, replace: "正在运行命令 $1" },
-    { pattern: /Running\\.\\.\\./gi, replace: "正在运行..." },
-    { pattern: /Are you sure you want to delete the project (.+)\\?/gi, replace: "您确定要删除项目 $1 吗？" },
+    { pattern: /Rules: (\d+) tokens/gi, replace: "规则: $1 字节 (tokens)" },
+    { pattern: /Skills: (\d+) tokens/gi, replace: "技能: $1 字节 (tokens)" },
+    { pattern: /Workflows: (\d+) tokens/gi, replace: "工作流: $1 字节 (tokens)" },
+    { pattern: /Show (\d+) breakdowns?/gi, replace: "显示 $1 个细分" },
+    { pattern: /(\d+)% remaining/gi, replace: "剩余 $1%" },
+    { pattern: /Refreshes in (\d+) hours?, (\d+) minutes?/gi, replace: "在 $1 小时 $2 分钟后刷新" },
+    { pattern: /See all \((\d+)\)/gi, replace: "查看全部 ($1)" },
+    { pattern: /^\s*(\d+)s\s*$/g, replace: "$1秒前" },
+    { pattern: /^\s*(\d+)m\s*$/g, replace: "$1分钟前" },
+    { pattern: /^\s*(\d+)h\s*$/g, replace: "$1小时前" },
+    { pattern: /^\s*(\d+)d\s*$/g, replace: "$1天前" },
+    { pattern: /^\s*(\d+)w\s*$/g, replace: "$1周前" },
+    { pattern: /^\s*(\d+)mo\s*$/g, replace: "$1个月前" },
+    { pattern: /^\s*(\d+)y\s*$/g, replace: "$1年前" },
+    { pattern: /Today (\d+:\d+)\s*AM/gi, replace: "今天上午 $1" },
+    { pattern: /Today (\d+:\d+)\s*PM/gi, replace: "今天下午 $1" },
+    { pattern: /Yesterday (\d+:\d+)\s*AM/gi, replace: "昨天上午 $1" },
+    { pattern: /Yesterday (\d+:\d+)\s*PM/gi, replace: "昨天下午 $1" },
+    { pattern: /^Thought for (\d+)s?/i, replace: "思考了 $1 秒" },
+    { pattern: /^Explored (\d+) files?/i, replace: "探索了 $1 个文件" },
+    { pattern: /^Edited\s+([a-zA-Z]{1,4})\s+(.+)/i, replace: "编辑了 $1 文件 $2" },
+    { pattern: /^Edited\s+(.+)/i, replace: "编辑了 $1" },
+    { pattern: /^Ran\s+(.+)/i, replace: "执行了命令 $1" },
+    { pattern: /^Run\s+(.+)/i, replace: "运行命令 $1" },
+    { pattern: /^Running\s+(.+)/i, replace: "正在运行命令 $1" },
+    { pattern: /^Running\.\.\./i, replace: "正在运行..." },
+    { pattern: /Are you sure you want to delete the project (.+)\?/gi, replace: "您确定要删除项目 $1 吗？" },
     { pattern: /Are you sure you want to delete the project/gi, replace: "您确定要删除项目 " },
     { pattern: /This will permanently delete the project and/gi, replace: "这将永久删除该项目及" },
-    { pattern: /within it\\.\\s*This action cannot be undone\\.?/gi, replace: "。此操作无法撤销。" },
-    { pattern: /within it\\.\\s*this action cannot be undone\\.?/gi, replace: "。此操作无法撤销。" },
-    { pattern: /Worked for (\\d+)s/gi, replace: "工作了 $1 秒" },
-    { pattern: /Worked for (\\d+)m/gi, replace: "工作了 $1 分钟" },
-    { pattern: /Explored (\\d+) artifacts?/gi, replace: "探索了 $1 个交付物" },
-    { pattern: /Explored (\\d+) files?, (\\d+) folders?/gi, replace: "探索了 $1 个文件，$2 个文件夹" },
-    { pattern: /Explored (\\d+) files?, (\\d+) searches?/gi, replace: "探索了 $1 个文件，执行了 $2 次搜索" },
-    { pattern: /Available AI Credits:\\s*(\\d+)/gi, replace: "可用 AI 额度: $1" },
-    // === 以下为新增的 -ing 及动态文本匹配 ===
-    { pattern: /Exploring (\\d+) artifacts?/gi, replace: "正在探索 $1 个交付物" },
-    { pattern: /Exploring (\\d+) files?, (\\d+) folders?/gi, replace: "正在探索 $1 个文件，$2 个文件夹" },
-    { pattern: /Exploring (\\d+) files?, (\\d+) searches?/gi, replace: "正在探索 $1 个文件，进行了 $2 次搜索" },
-    { pattern: /Exploring (\\d+) files?/gi, replace: "正在探索 $1 个文件" },
-    { pattern: /Exploring (\\d+) folders?/gi, replace: "正在探索 $1 个文件夹" },
-    { pattern: /Exploring (\\d+) searches?/gi, replace: "正在进行 $1 次搜索" },
-    { pattern: /Exploring (\\d+) search/gi, replace: "正在进行 $1 次搜索" },
-    { pattern: /Exploring\\.\\.\\./gi, replace: "正在探索..." },
-    { pattern: /Searching\\s+(.+)/gi, replace: "正在搜索 $1" },
-    { pattern: /Searching\\.\\.\\./gi, replace: "正在搜索..." },
-    { pattern: /Analyzed\\s+([a-zA-Z]{1,4})\\s+(.+)/gi, replace: "分析了 $1 文件 $2" },
-    { pattern: /Analyzed\\s+(.+)/gi, replace: "分析了 $1" },
-    { pattern: /Searched\\s+(.+)/gi, replace: "搜索了 $1" },
-    { pattern: /Working\\.\\.\\./gi, replace: "正在执行..." },
-    { pattern: /Working\\.\\./gi, replace: "正在执行.." },
-    { pattern: /Working\\./gi, replace: "正在执行." },
-    // === 针对 finished, Timer Cancelled ===
-    { pattern: /(.+)\\s+finished/gi, replace: "$1 已完成" },
-    { pattern: /Timer Cancelled/gi, replace: "定时器已取消" },
-    // === 针对 Timer 和 Timed ===
-    { pattern: /Timer has expired/gi, replace: "定时器已过期" },
-    { pattern: /Timed (\\d+) seconds?/gi, replace: "定时了 $1 秒" },
-    { pattern: /Timed (\\d+) minutes?/gi, replace: "定时了 $1 分钟" },
-    { pattern: /Timed (\\d+) hours?/gi, replace: "定时了 $1 小时" },
-    { pattern: /Waiting (\\d+) seconds?/gi, replace: "等待 $1 秒" },
-    { pattern: /Waiting (\\d+) minutes?/gi, replace: "等待 $1 分钟" },
-    { pattern: /Waiting (\\d+) hours?/gi, replace: "等待 $1 小时" },
-    // === 针对 tasks running ===
-    { pattern: /(\\d+)\\s+tasks?\\s+running/gi, replace: "$1 个任务正在运行" },
-    { pattern: /No tasks running/gi, replace: "无运行中的任务" },
-    // === 针对 Timer 任务列表项 ===
-    { pattern: /Timer:\\s*(\\d+)s,\\s*Prompt:\\s*/gi, replace: "定时器: $1秒, 提示词: " },
-    { pattern: /Timer:\\s*(\\d+)m,\\s*Prompt:\\s*/gi, replace: "定时器: $1分钟, 提示词: " },
-    { pattern: /Timer:\\s*(\\d+)h,\\s*Prompt:\\s*/gi, replace: "定时器: $1小时, 提示词: " },
-    { pattern: /Timer:\\s*(\\d+)s/gi, replace: "定时器: $1秒" },
-    { pattern: /Timer:\\s*(\\d+)m/gi, replace: "定时器: $1分钟" },
-    { pattern: /Timer:\\s*(\\d+)h/gi, replace: "定时器: $1小时" },
-    // === 针对 files changed ===
-    { pattern: /(\\d+)\\s+files?\\s+changed/gi, replace: "$1 个文件已修改" },
-    // === 针对 pages/urls/tabs explored ===
-    { pattern: /(\\d+)\\s+pages?/gi, replace: "$1 个页面" },
-    { pattern: /(\\d+)\\s+urls?/gi, replace: "$1 个 URL" },
-    { pattern: /(\\d+)\\s+tabs?/gi, replace: "$1 个标签页" },
-    // === 针对通用的数值+单词组合 ===
-    { pattern: /(\\d+)\\s+artifacts?/gi, replace: "$1 个交付物" },
-    { pattern: /(\\d+)\\s+files?/gi, replace: "$1 个文件" },
-    { pattern: /(\\d+)\\s+folders?/gi, replace: "$1 个文件夹" },
-    { pattern: /(\\d+)\\s+search(es)?/gi, replace: "$1 次搜索" },
-    { pattern: /(\\d+)\\s+results?/gi, replace: "$1 个结果" },
-    { pattern: /Auto-proceeded with/gi, replace: "已自动继续" },
-    { pattern: /Auto-proceeding with/gi, replace: "正在自动继续" },
-    // === 针对 timed check 等时态 ===
-    { pattern: /Timed\\s+checked\\s+for\\s+(\\d+)s/gi, replace: "定时检查了 $1 秒" },
-    { pattern: /Timed\\s+checking\\s+for\\s+(\\d+)s/gi, replace: "定时检查中 ($1 秒)" },
-    { pattern: /Timed\\s+check\\s+for\\s+(\\d+)s/gi, replace: "定时检查 ($1 秒)" },
-    { pattern: /Timed\\s+checked/gi, replace: "已定时检查" },
-    { pattern: /Timed\\s+checking/gi, replace: "正在定时检查" },
-    { pattern: /Timed\\s+check/gi, replace: "定时检查" },
-    // === 针对 Stopped after 运行后停止 ===
-    { pattern: /Stopped\\s+after\\s+(\\d+)s/gi, replace: "运行 $1 秒后停止" },
-    { pattern: /Stopped\\s+after\\s+(\\d+)m/gi, replace: "运行 $1 分钟后停止" },
-    { pattern: /Stopped\\s+after\\s+(\\d+)h/gi, replace: "运行 $1 小时后停止" },
-    { pattern: /Stopped\\s+after\\s+(\\d+)d/gi, replace: "运行 $1 天后停止" },
-    { pattern: /Stopped\\s+after\\s+(.+)/gi, replace: "运行 $1 后停止" },
-    // === 针对权限请求动态选项 (Permission Request Options) ===
-    { pattern: /Yes, and always allow (.+?) in this project/gi, replace: "是的，并且在此项目中始终允许 $1" },
-    { pattern: /Yes, and always allow (.+)/gi, replace: "是的，并且始终允许 $1" },
-    // === 针对通知中的 Command: 前缀 ===
-    { pattern: /^Command:\\s*/gi, replace: "命令：" }
+    { pattern: /within it\.\s*This action cannot be undone\.?/gi, replace: "。此操作无法撤销。" },
+    { pattern: /within it\.\s*this action cannot be undone\.?/gi, replace: "。此操作无法撤销。" },
+    { pattern: /^Worked for (\d+)s/i, replace: "工作了 $1 秒" },
+    { pattern: /^Worked for (\d+)m/i, replace: "工作了 $1 分钟" },
+    { pattern: /^Explored (\d+) artifacts?/i, replace: "探索了 $1 个交付物" },
+    { pattern: /^Explored (\d+) files?, (\d+) folders?/i, replace: "探索了 $1 个文件，$2 个文件夹" },
+    { pattern: /^Explored (\d+) files?, (\d+) searches?/i, replace: "探索了 $1 个文件，执行了 $2 次搜索" },
+    { pattern: /Available AI Credits:\s*(\d+)/gi, replace: "可用 AI 额度: $1" },
+    { pattern: /^Exploring (\d+) artifacts?/i, replace: "正在探索 $1 个交付物" },
+    { pattern: /^Exploring (\d+) files?, (\d+) folders?/i, replace: "正在探索 $1 个文件，$2 个文件夹" },
+    { pattern: /^Exploring (\d+) files?, (\d+) searches?/i, replace: "正在探索 $1 个文件，进行了 $2 次搜索" },
+    { pattern: /^Exploring (\d+) files?/i, replace: "正在探索 $1 个文件" },
+    { pattern: /^Exploring (\d+) folders?/i, replace: "正在探索 $1 个文件夹" },
+    { pattern: /^Exploring (\d+) searches?/i, replace: "正在进行 $1 次搜索" },
+    { pattern: /^Exploring (\d+) search/i, replace: "正在进行 $1 次搜索" },
+    { pattern: /^Exploring\.\.\./i, replace: "正在探索..." },
+    { pattern: /^Searching\s+(.+)/i, replace: "正在搜索 $1" },
+    { pattern: /^Searching\.\.\./i, replace: "正在搜索..." },
+    { pattern: /^Analyzed\s+([a-zA-Z]{1,4})\s+(.+)/i, replace: "分析了 $1 文件 $2" },
+    { pattern: /^Analyzed\s+(.+)/i, replace: "分析了 $1" },
+    { pattern: /^Searched\s+(.+)/i, replace: "搜索了 $1" },
+    { pattern: /^Working\.\.\./i, replace: "正在执行..." },
+    { pattern: /^Working\.\./i, replace: "正在执行.." },
+    { pattern: /^Working\./i, replace: "正在执行." },
+    { pattern: /^(.+)\s+finished/i, replace: "$1 已完成" },
+    { pattern: /^Timer has expired/i, replace: "定时器已过期" },
+    { pattern: /^Timed (\d+) seconds?/i, replace: "定时了 $1 秒" },
+    { pattern: /^Timed (\d+) minutes?/i, replace: "定时了 $1 分钟" },
+    { pattern: /^Timed (\d+) hours?/i, replace: "定时了 $1 小时" },
+    { pattern: /^Waiting (\d+) seconds?/i, replace: "等待 $1 秒" },
+    { pattern: /^Waiting (\d+) minutes?/i, replace: "等待 $1 分钟" },
+    { pattern: /^Waiting (\d+) hours?/i, replace: "等待 $1 小时" },
+    { pattern: /^(\d+)\s+tasks?\s+running/i, replace: "$1 个任务正在运行" },
+    { pattern: /^No tasks running/i, replace: "无运行中的任务" },
+    { pattern: /^Timer:\s*(\d+)s,\s*Prompt:\s*/i, replace: "定时器: $1秒, 提示词: " },
+    { pattern: /^Timer:\s*(\d+)m,\s*Prompt:\s*/i, replace: "定时器: $1分钟, 提示词: " },
+    { pattern: /^Timer:\s*(\d+)h,\s*Prompt:\s*/i, replace: "定时器: $1小时, 提示词: " },
+    { pattern: /^Timer:\s*(\d+)s/i, replace: "定时器: $1秒" },
+    { pattern: /^Timer:\s*(\d+)m/i, replace: "定时器: $1分钟" },
+    { pattern: /^Timer:\s*(\d+)h/i, replace: "定时器: $1小时" },
+    { pattern: /^(\d+)\s+files?\s+changed/i, replace: "$1 个文件已修改" },
+    { pattern: /^(\d+)\s+pages?/i, replace: "$1 个页面" },
+    { pattern: /^(\d+)\s+urls?/i, replace: "$1 个 URL" },
+    { pattern: /^(\d+)\s+tabs?/i, replace: "$1 个标签页" },
+    { pattern: /^(\d+)\s+artifacts?/i, replace: "$1 个交付物" },
+    { pattern: /^(\d+)\s+files?/i, replace: "$1 个文件" },
+    { pattern: /^(\d+)\s+folders?/i, replace: "$1 个文件夹" },
+    { pattern: /^(\d+)\s+search(es)?/i, replace: "$1 次搜索" },
+    { pattern: /^(\d+)\s+results?/i, replace: "$1 个结果" },
+    { pattern: /^Timed\s+checked\s+for\s+(\d+)s/i, replace: "定时检查了 $1 秒" },
+    { pattern: /^Timed\s+checking\s+for\s+(\d+)s/i, replace: "定时检查中 ($1 秒)" },
+    { pattern: /^Timed\s+check\s+for\s+(\d+)s/i, replace: "定时检查 ($1 秒)" },
+    { pattern: /^Stopped\s+after\s+(\d+)s/i, replace: "运行 $1 秒后停止" },
+    { pattern: /^Stopped\s+after\s+(\d+)m/i, replace: "运行 $1 分钟后停止" },
+    { pattern: /^Stopped\s+after\s+(\d+)h/i, replace: "运行 $1 小时后停止" },
+    { pattern: /^Stopped\s+after\s+(\d+)d/i, replace: "运行 $1 天后停止" },
+    { pattern: /^Stopped\s+after\s+(.+)/i, replace: "运行 $1 后停止" },
+    { pattern: /^Yes, and always allow (.+?) in this project/i, replace: "是的，并且在此项目中始终允许 $1" },
+    { pattern: /^Yes, and always allow (.+)/i, replace: "是的，并且始终允许 $1" },
+    { pattern: /^Command:\s*/i, replace: "命令：" }
   ];
+
+  const sensitiveSingleWords = new Set([
+    'run', 'open', 'add', 'delete', 'allow', 'done', 'status', 
+    'cancel', 'close', 'save', 'edit', 'timer', 'result', 'results',
+    'preset', 'system', 'default', 'today', 'yesterday'
+  ]);
 
   globalThis.__antigravity_translate = function(text) {
     if (!text) return text;
     const key = text.trim().toLowerCase().replace(/\s+/g, ' ');
+    
+    // 敏感单字保护：防止终端、代码等场景下的纯小写单字命令/属性被错误翻译
+    if (sensitiveSingleWords.has(key) && text.trim() === key) {
+      return text;
+    }
     
     // 精确字典翻译
     if (translationDict[key]) {
@@ -794,7 +755,7 @@ try {
           ) {
             return true;
           }
-          // 模糊匹配：若类名包含 thought/thinking/message/bubble/markdown/prompt，则属于会话内容或思考区，跳过翻译
+          // 模糊匹配：若类名包含 thought/thinking/message/bubble/markdown/prompt/terminal/xterm/console/shell/bash/editor，则属于会话内容、思考区或终端/编辑器，跳过翻译
           for (let i = 0; i < current.classList.length; i++) {
             const cls = current.classList[i].toLowerCase();
             if (
@@ -803,7 +764,17 @@ try {
               cls.includes('message') ||
               cls.includes('bubble') ||
               cls.includes('markdown') ||
-              cls.includes('prompt')
+              cls.includes('prompt') ||
+              cls.includes('terminal') ||
+              cls.includes('xterm') ||
+              cls.includes('console') ||
+              cls.includes('shell') ||
+              cls.includes('bash') ||
+              cls.includes('zsh') ||
+              cls.includes('ssh') ||
+              cls.includes('editor') ||
+              cls.includes('output') ||
+              cls.includes('command')
             ) {
               return true;
             }
