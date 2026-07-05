@@ -5,8 +5,9 @@ const { execSync } = require('child_process');
 // 1. 配置路径
 const appPath = '/Applications/Antigravity.app';
 const resourcesPath = path.join(appPath, 'Contents/Resources');
-const asarPath = path.join(resourcesPath, 'app.asar');
-const backupAsarPath = path.join(resourcesPath, 'app.asar.bak');
+const originalAsarPath = path.join(resourcesPath, 'app.asar');
+const originalBackupAsarPath = path.join(resourcesPath, 'app.asar.bak');
+const outputAsarPath = path.join(__dirname, 'patched_app.asar'); // New output path
 const tempDir = path.join(__dirname, 'temp_extracted_asar');
 
 console.log('=== Antigravity UI 中文化补丁 (个性化细分增强版) ===');
@@ -17,22 +18,12 @@ if (!fs.existsSync(appPath)) {
   process.exit(1);
 }
 
-if (!fs.existsSync(asarPath)) {
-  console.error(`错误：找不到 app.asar 文件，路径应为: ${asarPath}`);
+if (!fs.existsSync(originalAsarPath)) {
+  console.error(`错误：找不到 app.asar 文件，路径应为: ${originalAsarPath}`);
   process.exit(1);
 }
 
-// 3. 备份原 app.asar (如果不存在备份则备份，存在则使用备份恢复，确保每次都是干净的包打补丁)
-if (!fs.existsSync(backupAsarPath)) {
-  console.log('正在备份原始 app.asar...');
-  fs.copyFileSync(asarPath, backupAsarPath);
-  console.log(`备份已保存至: ${backupAsarPath}`);
-} else {
-  console.log('检测到已备份的原始 app.asar，正在恢复以确保应用干净的补丁...');
-  fs.copyFileSync(backupAsarPath, asarPath);
-  console.log('原始 app.asar 恢复成功。');
-}
-
+// 3. 智能检测备份与恢复机制
 // 4. 清理并创建临时解包目录
 if (fs.existsSync(tempDir)) {
   fs.rmSync(tempDir, { recursive: true, force: true });
@@ -40,10 +31,59 @@ if (fs.existsSync(tempDir)) {
 fs.mkdirSync(tempDir);
 
 try {
-  // 5. 使用 npx 解包 asar
-  console.log('正在解包 app.asar...');
-  execSync(`npx -y @electron/asar extract "${asarPath}" "${tempDir}"`, { stdio: 'inherit' });
-  console.log('解包成功！');
+  // 5. 智能解包检测
+  console.log('正在检测应用目录下的 app.asar 状态...');
+  execSync(`npx -y @electron/asar extract "${originalAsarPath}" "${tempDir}"`, { stdio: 'inherit' });
+  
+  const inspectPreloadPath = path.join(tempDir, 'dist/preload.js');
+  let isAlreadyPatched = false;
+  if (fs.existsSync(inspectPreloadPath)) {
+    const content = fs.readFileSync(inspectPreloadPath, 'utf8');
+    if (content.includes('ANTIGRAVITY L10N PATCH')) {
+      isAlreadyPatched = true;
+    }
+  }
+
+  if (!isAlreadyPatched) {
+    console.log('检测到应用目录下的 app.asar 为未汉化干净原包（可能是应用刚更新过）。');
+    console.log('正在备份当前的干净 asar 为 app.asar.bak...');
+    fs.copyFileSync(originalAsarPath, originalBackupAsarPath);
+    console.log(`备份成功，已保存至: ${originalBackupAsarPath}`);
+  } else {
+    console.log('检测到应用目录下的 app.asar 已经是打过汉化补丁的包。');
+    if (fs.existsSync(originalBackupAsarPath)) {
+      console.log('正在从干净的备份 app.asar.bak 重新解压，作为打补丁的基础包...');
+      fs.rmSync(tempDir, { recursive: true, force: true });
+      fs.mkdirSync(tempDir);
+      
+      const originalUnpackedPath = path.join(resourcesPath, 'app.asar.unpacked');
+      const originalBackupUnpackedPath = path.join(resourcesPath, 'app.asar.bak.unpacked');
+      let createdSymlink = false;
+      if (fs.existsSync(originalUnpackedPath) && !fs.existsSync(originalBackupUnpackedPath)) {
+        try {
+          fs.symlinkSync(originalUnpackedPath, originalBackupUnpackedPath, 'dir');
+          createdSymlink = true;
+        } catch (symErr) {
+          console.warn('创建 app.asar.bak.unpacked 软链接失败:', symErr.message);
+        }
+      }
+
+      try {
+        execSync(`npx -y @electron/asar extract "${originalBackupAsarPath}" "${tempDir}"`, { stdio: 'inherit' });
+        console.log('基础包解压成功。');
+      } finally {
+        if (createdSymlink && fs.existsSync(originalBackupUnpackedPath)) {
+          try {
+            fs.unlinkSync(originalBackupUnpackedPath);
+          } catch (unErr) {
+            console.warn('清理 app.asar.bak.unpacked 软链接失败:', unErr.message);
+          }
+        }
+      }
+    } else {
+      console.log('警告：检测到已汉化，但找不到原始备份 app.asar.bak。将直接在此基础上更新补丁。');
+    }
+  }
 
   // 6. 注入翻译脚本至 preload.js
   console.log('正在注入翻译脚本至 preload.js...');
@@ -56,10 +96,9 @@ try {
 // ==================== ANTIGRAVITY L10N PATCH ====================
 (function() {
   try {
-
-  // 使用全小写作为键，实现大小写不敏感的高鲁棒性匹配
   const translationDict = {
-    // 登录与身份验证界面 (Login & Authentication)
+    "confirm undo": "确认撤销",
+    "this undo action will not make any code changes.": "此撤销操作不会对代码做出任何更改。",
     "sign in": "登录",
     "log in to use the agent": "登录以使用智能体",
     "to use the agent, please login": "要使用智能体，请登录",
@@ -74,21 +113,30 @@ try {
     "welcome to": "欢迎来到",
     "authentication required": "需要身份验证",
     "open settings": "打开设置",
+    "preview": "预览",
+    "expand": "展开",
+    "collapse": "收起",
+    "goal": "目标",
+    "no browser pages open": "未打开浏览器页面",
+    "opened url in browser": "已在浏览器中打开 URL",
+    "opening url in browser": "正在浏览器中打开 URL",
+    "configure": "配置",
+    "deny": "拒绝",
+    "allow once": "允许一次",
+    "always allow": "总是允许",
+    "waiting for user input...": "等待用户输入...",
+    "agent needs permission to act on": "智能体需要操作 ",
     "awaiting authentication...": "等待身份验证...",
     "awaiting authentication": "等待身份验证",
     "use google cloud project instead": "改用 Google Cloud 项目",
     "previous": "返回",
     "continue": "继续",
-
-    // 基础导航
     "antigravity": "Antigravity",
     "task": "任务清单",
     "settings": "设置",
     "implementation plan": "实施计划",
     "walkthrough": "演示与回顾",
     "verify": "验证",
-    
-    // 侧边栏
     "general": "通用",
     "new conversation": "新建会话",
     "conversation history": "会话历史",
@@ -108,8 +156,6 @@ try {
     "delete conversation": "删除会话",
     "new conversation in project": "在项目中新建会话",
     "project settings": "项目设置",
-    
-    // 设置侧边栏标签
     "account": "账户",
     "permissions": "权限",
     "appearance": "外观",
@@ -121,8 +167,6 @@ try {
     "show all": "显示全部",
     "conversations": "会话",
     "browser": "浏览器",
-    
-    // 账户设置 (Account Settings)
     "manage your plan, credentials, and general preferences.": "管理您的计划、凭证和通用偏好。",
     "enable telemetry": "启用数据遥测",
     "when toggled on, antigravity collects usage data to help google enhance performance and features.": "开启后，Antigravity 将收集使用数据，以帮助 Google 提升性能和功能。",
@@ -138,8 +182,6 @@ try {
     "by using this app, you agree to its": "使用此应用即表示您同意其",
     "terms of service": "服务条款",
     "terms of service.": "服务条款。",
-
-    // 权限与智能体设置 (Permissions & Agent Settings)
     "configure global allowed and denied resource permissions.": "配置全局允许和拒绝的资源权限。",
     "project-specific settings": "项目特定设置",
     "modify scoped permissions, folders, and agent settings like sandbox and terminal command execution.": "修改特定项目范围内的权限、文件夹，以及像沙箱和终端命令执行这样的智能体设置。",
@@ -154,7 +196,7 @@ try {
     "mcp tools": "MCP 工具",
     "configure external tools via model context protocol.": "通过模型上下文协议配置外部工具。",
     "configure allowed and denied paths for file reads and writes.": "配置允许和拒绝文件读写的路径。",
-    "configure allowed and denied urls for reading.": "配置允许 and 拒绝读取的 URL。",
+    "configure allowed and denied urls for reading.": "配置允许和拒绝读取的 URL。",
     "no folders added yet.": "尚未添加任何文件夹。",
     "folders": "文件夹",
     "+ add folder": "+ 添加文件夹",
@@ -185,8 +227,6 @@ try {
     "network access rules": "网络访问规则",
     "open": "打开",
     "打开": "打开",
-    
-    // 权限设置中的句段/短语碎片
     "inherits from": "继承自",
     "inherits from ": "继承自 ",
     "global settings": "全局设置",
@@ -197,8 +237,6 @@ try {
     "learn more": "了解更多",
     "learn more about": "了解更多关于",
     "learn more about ": "了解更多关于 ",
-
-    // 个性化设置 (Customizations Settings)
     "the breakdown below shows token usage from customizations like skills, rules, and mcp. if the budget is exceeded, large customizations will be truncated automatically.": "以下细分显示了来自技能、规则和 MCP 等自定义项的 Token 使用情况。如果超出了预算，大型自定义项将被自动截断。",
     "customization token budget exceeded. large customizations will be truncated.": "已超出自定义 Token 预算。大型自定义项将被自动截断。",
     "% of the customization budget is available.": "% 的个性化预算可用。",
@@ -206,8 +244,6 @@ try {
     "skills": "技能",
     "mcp": "MCP",
     "hide breakdown": "隐藏细分",
-
-    // 外观设置 (Appearance Settings)
     "configure the agent's visual theme and display preferences.": "配置智能体的视觉主题与显示偏好。",
     "chat settings": "聊天设置",
     "verbose agent chat": "详细智能体聊天",
@@ -222,8 +258,6 @@ try {
     "system": "系统默认",
     "default light": "默认浅色",
     "default dark": "默认深色",
-
-    // 更多模型与通用 UI
     "model selection": "模型选择",
     "no models available": "无可用模型",
     "select model": "选择模型",
@@ -244,8 +278,6 @@ try {
     "save": "保存",
     "close": "关闭",
     "apply": "应用",
-
-    // App Settings
     "app settings": "应用设置",
     "manage application settings.": "管理应用设置。",
     "prevent sleep": "防止休眠",
@@ -256,8 +288,6 @@ try {
     "notification settings": "通知设置",
     "to modify notification settings, open your operating system's system preferences.": "要修改通知设置，请打开您操作系统的系统偏好设置。",
     "open system preferences": "打开系统偏好设置",
-
-    // Browser Settings
     "browser settings": "浏览器设置",
     "configure the browser subagent. it requires google chrome to be installed. the browser subagent can be invoked by typing /browser in the conversation input box.": "配置浏览器子智能体。它需要安装 Google Chrome。可以在会话输入框中输入 /browser 启动浏览器子智能体。",
     "browser javascript execution policy": "浏览器 JavaScript 执行策略",
@@ -267,11 +297,7 @@ try {
     "configure allowed and denied urls for browser actuation.": "配置允许和拒绝进行浏览器操作的 URL 规则。",
     "edit": "编辑",
     "request review": "需要审查",
-
-    // Conversations
     "agent settings and permissions for conversations outside of projects.": "针对项目外对话的智能体设置与权限。",
-
-    // 增补系统常用 UI 控件
     "typeahead menu": "输入预测菜单",
     "sidebar": "侧边栏",
     "toggle sidebar": "切换侧边栏",
@@ -366,6 +392,8 @@ try {
     "to modify editor settings, open settings within the editor window.": "要修改编辑器设置，请在编辑器窗口中打开“设置”。",
     "open editor settings": "打开编辑器设置",
     "open ide": "打开 IDE",
+    "install ide": "安装 IDE",
+    "send queued message": "发送队列消息",
     "configure the browser subagent. it requires": "配置浏览器子智能体。它需要",
     "to be installed. the browser subagent can be invoked by typing /browser in the conversation input box.": "已安装。可以在会话输入框中输入 /browser 启动浏览器子智能体。",
     "manage your notification preferences.": "管理您的通知偏好。",
@@ -397,7 +425,7 @@ try {
     "attach antigravity server logs": "附加 Antigravity 服务端日志",
     "send feedback as shawnrain.me@gmail.com": "以 shawnrain.me@gmail.com 身份发送反馈",
     "we recommend attaching logs. attaching logs will help the antigravity team act on and prioritize your feedback.": "我们建议附加日志。附加日志将有助于 Antigravity 团队处理并优先考虑您的反馈。",
-    "keyboard shortcuts for quick navigation and control.": "用于快速导航和控制的键盘快捷键。",
+    "keyboard shortcuts for quick navigation and control.": "用于快速导航与控制的键盘快捷键。",
     "recommended": "推荐",
     "open conversation picker": "打开会话选择器",
     "open file search": "打开文件搜索",
@@ -421,6 +449,11 @@ try {
     "enable ai credit overages": "启用 AI 超额额度",
     "when toggled on, antigravity will use your ai credits to fulfill model requests once you're out of model quota. antigravity will always use your model quota first before using ai credits.": "开启后，一旦您的模型配额用尽，Antigravity 将使用您的 AI 信用额度来满足模型请求。Antigravity 会在尝试使用 AI 信用额度之前，始终优先使用您的模型配额。",
     "model quota": "模型配额",
+    "gemini models": "Gemini 模型",
+    "claude and gpt models": "Claude 和 GPT 模型",
+    "weekly limit": "周额度限制",
+    "five hour limit": "5 小时额度限制",
+    "within each group, models share a weekly limit and a 5-hour limit. quota is consumed proportionally to the cost of the tokens. thus, limits will last longer with shorter tasks or using more cost-effective models. the 5-hour limit smooths out aggregate demand to fairly distribute global capacity across all users, while your weekly limit is tied directly to your individual tier.": "在每个模型组内，所有模型共享一个周额度限制和一个 5 小时额度限制。配额的消耗与 Token 的成本成比例。因此，对于较短的任务或使用更具性价比的模型，额度将维持得更久。5 小时额度限制平抑了总体需求，以便在所有用户之间公平地分配全局容量，而您的周额度限制则直接与您的个人等级挂钩。",
     "view your available model quota and ai credits. model quota refreshes periodically based on your plan. enable ai credit overages to continue using models when your quota is exhausted.": "查看您可用的模型配额和 AI 信用额度。模型配额会根据您的计划定期刷新。启用 AI 超额额度可以在配额用尽时继续使用模型。",
     "loading token usage...": "正在加载 Token 使用量...",
     "global": "全局",
@@ -431,14 +464,10 @@ try {
     "select branch": "选择分支",
     "attaching logs requires an email address": "附加日志需要提供电子邮箱地址",
     "untitled conversation": "无标题会话",
-
-    // 技能说明的翻译 (只翻译其作用描述)
     "orchestrates android development tasks including project creation, deployment, sdk management, and environment diagnostics using the \`android\` command-line tool.": "使用 'android' 命令行工具协调 Android 开发任务，包括项目创建、部署、SDK 管理和环境诊断。",
     "orchestrates android development tasks including project creation, deployment, sdk management, and environment diagnostics using the android command-line tool.": "使用 android 命令行工具协调 Android 开发任务，包括项目创建、部署、SDK 管理和环境诊断。",
     "design, implement, and debug autonomous ai agents and multi-agent systems using the google antigravity (agy) sdk. activate this skill when the user wants to create, configure, or orchestrate google antigravity agents.": "使用 Google Antigravity (AGY) SDK 设计、实现和调试自主 AI 智能体及多智能体系统。当用户想要创建、配置或编排 Google Antigravity 智能体时，激活此技能。",
     "build professional native macos apps in swift with swiftui and appkit. full lifecycle - build, debug, test, optimize, ship. cli-only, no xcode.": "使用 Swift 结合 SwiftUI 和 AppKit 构建专业的原生 macOS 应用程序。全生命周期 - 构建、调试、测试、优化、出货。仅限命令行，无需 Xcode。",
-
-    // 增补最新发现的界面死角 (Overview, Review, 历史时间, 提示气泡)
     "overview": "总览",
     "review": "审查",
     "review changes": "审查改动",
@@ -491,22 +520,16 @@ try {
     "compacting...": "正在压缩...",
     "compacted": "已压缩",
     "stopped after": "运行后停止",
-
-    // 通知与弹窗偏好设置 (Notification preferences)
     "notification preferences": "通知偏好",
     "choose whether to be notified when the agent needs your attention or completes a task.": "选择当智能体需要您的关注或完成任务时是否接收通知。",
     "dismiss": "忽略",
     "open preferences": "打开偏好设置",
-
-    // 安全预设详情 (Security preset details)
     "default": "默认",
     "requires manual review for all terminal commands and file accesses outside of the working folders.": "对工作区文件夹外的所有终端命令和文件访问均需要人工审查。",
     "full machine": "整机",
     "all terminal commands require review. the agent can read or write to any file in the machine.": "所有终端命令均需要人工审查。智能体可以读写该机器上的任意文件。",
     "disables all safety barriers for maximal iteration velocity.": "禁用所有安全屏障以获得最高的迭代速度。",
     "manually customize individual settings.": "手动自定义各子项设置。",
-
-    // 智能体终止与错误提示 (Agent termination & error message)
     "agent terminated due to error": "智能体由于错误已终止",
     "see our troubleshooting guide for more help.": "查看我们的故障排除指南以获得更多帮助。",
     "troubleshooting guide": "故障排除指南",
@@ -520,22 +543,14 @@ try {
     "see our ": "请参阅我们的",
     "for more help.": "以获取更多帮助。",
     "for more help": "以获取更多帮助",
-
-    // 系统通知汉化 (System Notifications)
     "action requires your attention": "操作需要您的关注",
     "the agent is waiting for your input.": "智能体正在等待您的输入。",
     "task completed": "任务已完成",
     "the agent has completed the task.": "智能体已完成任务。",
-
-    // 请求终端权限通知 (Requesting terminal permission notification)
     "requesting your permission in terminal:": "请求执行终端命令的权限：",
     "requesting your permission in terminal": "请求执行终端命令的权限",
-
-    // 新增的工作区无自定义提示 (No customizations found for workspace)
     "no customizations found for this workspace.": "该工作区未发现自定义项。",
     "no customizations found for this workspace": "该工作区未发现自定义项",
-    
-    // 反馈与确认按钮 (Feedback & Confirmation tooltips/buttons)
     "copy": "复制",
     "good response": "好评",
     "bad response": "差评",
@@ -544,14 +559,10 @@ try {
     "ok": "确定",
     "confirm": "确认",
     "done": "完成",
-
-    // 搜索结果计数汉化 (Search result counts)
     "result": "个结果",
     "results": "个结果",
     "1 result": "1 个结果",
     "2 results": "2 个结果",
-
-    // 权限请求确认与选项 (Permission Request Prompt & Options)
     "allow running this command?": "是否允许运行此命令？",
     "yes, allow this time": "是的，仅允许这一次",
     "no (tell the agent what to do instead)": "拒绝（告诉智能体该做什么）",
@@ -563,145 +574,99 @@ try {
     "yes, and always allow reading": "是的，且始终允许读取",
     "yes, and always allow writing in this project": "是的，并且在此项目中始终允许写入",
     "yes, and always allow writing": "是的，且始终允许写入",
-
-    // Media (媒体) 汉化
-    "media": "媒体",
-
-    // 新建定时任务弹窗 (New Scheduled Task dialog)
-    "new scheduled task": "新建定时任务",
-    "name": "名称",
-    "enter task name": "输入任务名称",
-    "schedule": "计划",
-    "around": "约",
-    "prompt": "提示词",
-    "enter a prompt for the agent": "输入智能体的提示词",
-    "add scheduled task": "添加定时任务",
-    "search tasks...": "搜索任务...",
-    "search tasks": "搜索任务",
-    "all tasks run as flash.": "所有任务以 Flash 模式运行。",
-    "all tasks run as flash": "所有任务以 Flash 模式运行",
-
-    // 定时任务频率选项 (Schedule frequency options)
-    "daily": "每天",
-    "weekly": "每周",
-    "monthly": "每月",
-    "hourly": "每小时",
-    "weekdays": "工作日",
-    "weekends": "周末",
-    "every day": "每天",
-    "every week": "每周",
-    "every month": "每月",
-    "every hour": "每小时",
-
-    // 定时任务状态 (Scheduled task status)
-    "next run": "下次运行",
-    "last run": "上次运行",
-    "no tasks yet": "暂无任务",
-    "no scheduled tasks": "暂无定时任务",
-    "delete task": "删除任务",
-    "edit task": "编辑任务",
-    "enable task": "启用任务",
-    "disable task": "禁用任务",
-    "task enabled": "任务已启用",
-    "task disabled": "任务已禁用",
-    "task deleted": "任务已删除",
-    "the conversation was compacted to fit within the context window.": "会话已压缩以适应上下文窗口。",
-    "the conversation was compacted while generating this response.": "在生成此回复时，会话已被压缩。",
-    "the conversation was compacted to fit within the context window": "会话已压缩以适应上下文窗口",
-    "the conversation was compacted while generating this response": "在生成此回复时，会话已被压缩"
+    "media": "媒体"
   };
 
-  // 仅对长而唯一的短语使用正则替换，避免污染普通单词（如 App, Open, File）
   const regexReplacements = [
-    { pattern: /Rules: (\d+) tokens/gi, replace: "规则: $1 字节 (tokens)" },
-    { pattern: /Skills: (\d+) tokens/gi, replace: "技能: $1 字节 (tokens)" },
-    { pattern: /Workflows: (\d+) tokens/gi, replace: "工作流: $1 字节 (tokens)" },
-    { pattern: /Show (\d+) breakdowns?/gi, replace: "显示 $1 个细分" },
-    { pattern: /(\d+)% remaining/gi, replace: "剩余 $1%" },
-    { pattern: /Refreshes in (\d+) hours?, (\d+) minutes?/gi, replace: "在 $1 小时 $2 分钟后刷新" },
-    { pattern: /See all \((\d+)\)/gi, replace: "查看全部 ($1)" },
-    { pattern: /^\s*(\d+)s\s*$/g, replace: "$1秒前" },
-    { pattern: /^\s*(\d+)m\s*$/g, replace: "$1分钟前" },
-    { pattern: /^\s*(\d+)h\s*$/g, replace: "$1小时前" },
-    { pattern: /^\s*(\d+)d\s*$/g, replace: "$1天前" },
-    { pattern: /^\s*(\d+)w\s*$/g, replace: "$1周前" },
-    { pattern: /^\s*(\d+)mo\s*$/g, replace: "$1个月前" },
-    { pattern: /^\s*(\d+)y\s*$/g, replace: "$1年前" },
-    { pattern: /Today (\d+:\d+)\s*AM/gi, replace: "今天上午 $1" },
-    { pattern: /Today (\d+:\d+)\s*PM/gi, replace: "今天下午 $1" },
-    { pattern: /Yesterday (\d+:\d+)\s*AM/gi, replace: "昨天上午 $1" },
-    { pattern: /Yesterday (\d+:\d+)\s*PM/gi, replace: "昨天下午 $1" },
-    { pattern: /^Thought for (\d+)s?/i, replace: "思考了 $1 秒" },
-    { pattern: /^Explored (\d+) files?/i, replace: "探索了 $1 个文件" },
-    { pattern: /^Edited\s+([a-zA-Z]{1,4})\s+(.+)/i, replace: "编辑了 $1 文件 $2" },
-    { pattern: /^Edited\s+(.+)/i, replace: "编辑了 $1" },
-    { pattern: /^Ran\s+(.+)/i, replace: "执行了命令 $1" },
-    { pattern: /^Run\s+(.+)/i, replace: "运行命令 $1" },
-    { pattern: /^Running\s+(.+)/i, replace: "正在运行命令 $1" },
-    { pattern: /^Running\.\.\./i, replace: "正在运行..." },
-    { pattern: /Are you sure you want to delete the project (.+)\?/gi, replace: "您确定要删除项目 $1 吗？" },
+    { pattern: /^Agent needs permission to act on (.+)$/i, replace: "智能体需要操作 $1 的权限" },
+    { pattern: /^You have used some of your weekly limit, it will fully refresh in (\\d+) days?, (\\d+) hours?\\.?$/i, replace: "您已使用了一部分周额度限制，它将在 $1 天 $2 小时后完全刷新。" },
+    { pattern: /^You have used some of your weekly limit, it will fully refresh in (\\d+) days?\\.?$/i, replace: "您已使用了一部分周额度限制，它将在 $1 天后完全刷新。" },
+    { pattern: /^You have used some of your weekly limit, it will fully refresh in (\\d+) hours?\\.?$/i, replace: "您已使用了一部分周额度限制，它将在 $1 小时后完全刷新。" },
+    { pattern: /^You have used some of your 5-hour limit, it will fully refresh in (\\d+) hours?, (\\d+) minutes?\\.?$/i, replace: "您已使用了一部分 5 小时额度限制，它将在 $1 小时 $2 分钟后完全刷新。" },
+    { pattern: /^You have used some of your 5-hour limit, it will fully refresh in (\\d+) minutes?\\.?$/i, replace: "您已使用了一部分 5 小时额度限制，它将在 $1 分钟后完全刷新。" },
+    { pattern: /^You have used some of your 5-hour limit, it will fully refresh in (\\d+) hours?\\.?$/i, replace: "您已使用了一部分 5 小时额度限制，它将在 $1 小时后完全刷新。" },
+    { pattern: /^(\\d+)d$/i, replace: "$1天前" },
+    { pattern: /^(\\d+)h$/i, replace: "$1小时前" },
+    { pattern: /^(\\d+)m$/i, replace: "$1分钟前" },
+    { pattern: /^(\\d+)s$/i, replace: "$1 秒" },
+    { pattern: /^(\\d+)w$/i, replace: "$1周前" },
+    { pattern: /^(\\d+)mo$/i, replace: "$1个月前" },
+    { pattern: /^(\\d+)y$/i, replace: "$1年前" },
+    { pattern: /^See all \\((\\d+)\\)$/i, replace: "查看全部 ($1)" },
+    { pattern: /^See all$/i, replace: "查看全部" },
+    { pattern: /^to be installed\\.\\s*the browser subagent can be invoked by typing\\s*\\/browser\\s*in the conversation input box\\.?$/i, replace: "安装。可以在会话输入框中输入 /browser 启动浏览器子智能体。" },
+    { pattern: /^(\\d+)\\s+searches?$/i, replace: "$1 次搜索" },
+    { pattern: /^(\\d+)\\s+files?$/i, replace: "$1 个文件" },
+    { pattern: /^(\\d+)\\s+folders?$/i, replace: "$1 个文件夹" },
+    { pattern: /^(\\d+)\\s+tasks?$/i, replace: "$1 个任务" },
+    { pattern: /^(\\d+)\\s+artifacts?$/i, replace: "$1 个交付物" },
+    { pattern: /^Record Audio\\s+(.*)$/i, replace: "录制音频 $1" },
+    { pattern: /^Cancel\\s+\\((.+)\\)$/i, replace: "取消 ($1)" },
+    { pattern: /Are you sure you want to delete the project (.+)\\?/gi, replace: "您确定要删除项目 $1 吗？" },
     { pattern: /Are you sure you want to delete the project/gi, replace: "您确定要删除项目 " },
     { pattern: /This will permanently delete the project and/gi, replace: "这将永久删除该项目及" },
-    { pattern: /within it\.\s*This action cannot be undone\.?/gi, replace: "。此操作无法撤销。" },
-    { pattern: /within it\.\s*this action cannot be undone\.?/gi, replace: "。此操作无法撤销。" },
-    { pattern: /^Worked for (\d+)s/i, replace: "工作了 $1 秒" },
-    { pattern: /^Worked for (\d+)m/i, replace: "工作了 $1 分钟" },
-    { pattern: /^Explored (\d+) artifacts?/i, replace: "探索了 $1 个交付物" },
-    { pattern: /^Explored (\d+) files?, (\d+) folders?/i, replace: "探索了 $1 个文件，$2 个文件夹" },
-    { pattern: /^Explored (\d+) files?, (\d+) searches?/i, replace: "探索了 $1 个文件，执行了 $2 次搜索" },
-    { pattern: /Available AI Credits:\s*(\d+)/gi, replace: "可用 AI 额度: $1" },
-    { pattern: /^Exploring (\d+) artifacts?/i, replace: "正在探索 $1 个交付物" },
-    { pattern: /^Exploring (\d+) files?, (\d+) folders?/i, replace: "正在探索 $1 个文件，$2 个文件夹" },
-    { pattern: /^Exploring (\d+) files?, (\d+) searches?/i, replace: "正在探索 $1 个文件，进行了 $2 次搜索" },
-    { pattern: /^Exploring (\d+) files?/i, replace: "正在探索 $1 个文件" },
-    { pattern: /^Exploring (\d+) folders?/i, replace: "正在探索 $1 个文件夹" },
-    { pattern: /^Exploring (\d+) searches?/i, replace: "正在进行 $1 次搜索" },
-    { pattern: /^Exploring (\d+) search/i, replace: "正在进行 $1 次搜索" },
-    { pattern: /^Exploring\.\.\./i, replace: "正在探索..." },
-    { pattern: /^Searching\s+(.+)/i, replace: "正在搜索 $1" },
-    { pattern: /^Searching\.\.\./i, replace: "正在搜索..." },
-    { pattern: /^Analyzed\s+([a-zA-Z]{1,4})\s+(.+)/i, replace: "分析了 $1 文件 $2" },
-    { pattern: /^Analyzed\s+(.+)/i, replace: "分析了 $1" },
-    { pattern: /^Searched\s+(.+)/i, replace: "搜索了 $1" },
-    { pattern: /^Working\.\.\./i, replace: "正在执行..." },
-    { pattern: /^Working\.\./i, replace: "正在执行.." },
-    { pattern: /^Working\./i, replace: "正在执行." },
-    { pattern: /^(.+)\s+finished/i, replace: "$1 已完成" },
+    { pattern: /within it\\.\\s*This action cannot be undone\\.?/gi, replace: "。此操作无法撤销。" },
+    { pattern: /within it\\.\\s*this action cannot be undone\\.?/gi, replace: "。此操作无法撤销。" },
+    { pattern: /^Worked for (\\d+)s/i, replace: "工作了 $1 秒" },
+    { pattern: /^Worked for (\\d+)m/i, replace: "工作了 $1 分钟" },
+    { pattern: /^Explored (\\d+) artifacts?/i, replace: "探索了 $1 个交付物" },
+    { pattern: /^Explored (\\d+) files?, (\\d+) folders?/i, replace: "探索了 $1 个文件，$2 个文件夹" },
+    { pattern: /^Explored (\\d+) files?, (\\d+) searches?/i, replace: "探索了 $1 个文件，执行了 $2 次搜索" },
+    { pattern: /Available AI Credits:\\s*(\\d+)/gi, replace: "可用 AI 额度: $1" },
+    { pattern: /^Exploring (\\d+) artifacts?/i, replace: "正在探索 $1 个交付物" },
+    { pattern: /^Exploring (\\d+) files?, (\\d+) folders?/i, replace: "正在探索 $1 个文件，$2 个文件夹" },
+    { pattern: /^Exploring (\\d+) files?, (\\d+) searches?/i, replace: "正在探索 $1 个文件，进行了 $2 次搜索" },
+    { pattern: /^Exploring (\\d+) files?/i, replace: "正在探索 $1 个文件" },
+    { pattern: /^Exploring (\\d+) folders?/i, replace: "正在探索 $1 个文件夹" },
+    { pattern: /^Exploring (\\d+) searches?/i, replace: "正在进行 $1 次搜索" },
+    { pattern: /^Exploring (\\d+) search/i, replace: "正在进行 $1 次搜索" },
+    { pattern: /^Exploring\\.\\.\\./i, replace: "正在探索..." },
+    { pattern: /^Searching\\s+(.+)/i, replace: "正在搜索 $1" },
+    { pattern: /^Searching\\.\\.\\./i, replace: "正在搜索..." },
+    { pattern: /^Analyzed\\s+([a-zA-Z]{1,4})\\s+(.+)/i, replace: "分析了 $1 文件 $2" },
+    { pattern: /^Analyzed\\s+(.+)/i, replace: "分析了 $1" },
+    { pattern: /^Searched\\s+(.+)/i, replace: "搜索了 $1" },
+    { pattern: /^Working\\.\\.\\./i, replace: "正在执行..." },
+    { pattern: /^Working\\.\\./i, replace: "正在执行.." },
+    { pattern: /^Working\\./i, replace: "正在执行." },
+    { pattern: /^(.+)\\s+finished/i, replace: "$1 已完成" },
     { pattern: /^Timer has expired/i, replace: "定时器已过期" },
-    { pattern: /^Timed (\d+) seconds?/i, replace: "定时了 $1 秒" },
-    { pattern: /^Timed (\d+) minutes?/i, replace: "定时了 $1 分钟" },
-    { pattern: /^Timed (\d+) hours?/i, replace: "定时了 $1 小时" },
-    { pattern: /^Waiting (\d+) seconds?/i, replace: "等待 $1 秒" },
-    { pattern: /^Waiting (\d+) minutes?/i, replace: "等待 $1 分钟" },
-    { pattern: /^Waiting (\d+) hours?/i, replace: "等待 $1 小时" },
-    { pattern: /^(\d+)\s+tasks?\s+running/i, replace: "$1 个任务正在运行" },
+    { pattern: /^Timed (\\d+) seconds?/i, replace: "定时了 $1 秒" },
+    { pattern: /^Timed (\\d+) minutes?/i, replace: "定时了 $1 分钟" },
+    { pattern: /^Timed (\\d+) hours?/i, replace: "定时了 $1 小时" },
+    { pattern: /^Waiting (\\d+) seconds?/i, replace: "等待 $1 秒" },
+    { pattern: /^Waiting (\\d+) minutes?/i, replace: "等待 $1 分钟" },
+    { pattern: /^Waiting (\\d+) hours?/i, replace: "等待 $1 小时" },
+    { pattern: /^(\\d+)\\s+tasks?\\s+running/i, replace: "$1 个任务正在运行" },
     { pattern: /^No tasks running/i, replace: "无运行中的任务" },
-    { pattern: /^Timer:\s*(\d+)s,\s*Prompt:\s*/i, replace: "定时器: $1秒, 提示词: " },
-    { pattern: /^Timer:\s*(\d+)m,\s*Prompt:\s*/i, replace: "定时器: $1分钟, 提示词: " },
-    { pattern: /^Timer:\s*(\d+)h,\s*Prompt:\s*/i, replace: "定时器: $1小时, 提示词: " },
-    { pattern: /^Timer:\s*(\d+)s/i, replace: "定时器: $1秒" },
-    { pattern: /^Timer:\s*(\d+)m/i, replace: "定时器: $1分钟" },
-    { pattern: /^Timer:\s*(\d+)h/i, replace: "定时器: $1小时" },
-    { pattern: /^(\d+)\s+files?\s+changed/i, replace: "$1 个文件已修改" },
-    { pattern: /^(\d+)\s+pages?/i, replace: "$1 个页面" },
-    { pattern: /^(\d+)\s+urls?/i, replace: "$1 个 URL" },
-    { pattern: /^(\d+)\s+tabs?/i, replace: "$1 个标签页" },
-    { pattern: /^(\d+)\s+artifacts?/i, replace: "$1 个交付物" },
-    { pattern: /^(\d+)\s+files?/i, replace: "$1 个文件" },
-    { pattern: /^(\d+)\s+folders?/i, replace: "$1 个文件夹" },
-    { pattern: /^(\d+)\s+search(es)?/i, replace: "$1 次搜索" },
-    { pattern: /^(\d+)\s+results?/i, replace: "$1 个结果" },
-    { pattern: /^Timed\s+checked\s+for\s+(\d+)s/i, replace: "定时检查了 $1 秒" },
-    { pattern: /^Timed\s+checking\s+for\s+(\d+)s/i, replace: "定时检查中 ($1 秒)" },
-    { pattern: /^Timed\s+check\s+for\s+(\d+)s/i, replace: "定时检查 ($1 秒)" },
-    { pattern: /^Stopped\s+after\s+(\d+)s/i, replace: "运行 $1 秒后停止" },
-    { pattern: /^Stopped\s+after\s+(\d+)m/i, replace: "运行 $1 分钟后停止" },
-    { pattern: /^Stopped\s+after\s+(\d+)h/i, replace: "运行 $1 小时后停止" },
-    { pattern: /^Stopped\s+after\s+(\d+)d/i, replace: "运行 $1 天后停止" },
-    { pattern: /^Stopped\s+after\s+(.+)/i, replace: "运行 $1 后停止" },
+    { pattern: /^Timer:\\s*(\\d+)s,\\s*Prompt:\\s*/i, replace: "定时器: $1秒, 提示词: " },
+    { pattern: /^Timer:\\s*(\\d+)m,\\s*Prompt:\\s*/i, replace: "定时器: $1分钟, 提示词: " },
+    { pattern: /^Timer:\\s*(\\d+)h,\\s*Prompt:\\s*/i, replace: "定时器: $1小时, 提示词: " },
+    { pattern: /^Timer:\\s*(\\d+)s/i, replace: "定时器: $1秒" },
+    { pattern: /^Timer:\\s*(\\d+)m/i, replace: "定时器: $1分钟" },
+    { pattern: /^Timer:\\s*(\\d+)h/i, replace: "定时器: $1小时" },
+    { pattern: /^(\\d+)\\s+files?\\s+changed/i, replace: "$1 个文件已修改" },
+    { pattern: /^(\\d+)\\s+pages?/i, replace: "$1 个页面" },
+    { pattern: /^(\\d+)\\s+urls?/i, replace: "$1 个 URL" },
+    { pattern: /^(\\d+)\\s+tabs?/i, replace: "$1 个标签页" },
+    { pattern: /^(\\d+)\\s+artifacts?/i, replace: "$1 个交付物" },
+    { pattern: /^(\\d+)\\s+files?/i, replace: "$1 个文件" },
+    { pattern: /^(\\d+)\\s+folders?/i, replace: "$1 个文件夹" },
+    { pattern: /^(\\d+)\\s+search(es)?/i, replace: "$1 次搜索" },
+    { pattern: /^(\\d+)\\s+results?/i, replace: "$1 个结果" },
+    { pattern: /^Timed\\s+checked\\s+for\\s+(\\d+)s/i, replace: "定时检查了 $1 秒" },
+    { pattern: /^Timed\\s+checking\\s+for\\s+(\\d+)s/i, replace: "定时检查中 ($1 秒)" },
+    { pattern: /^Timed\\s+check\\s+for\\s+(\\d+)s/i, replace: "定时检查 ($1 秒)" },
+    { pattern: /^Stopped\\s+after\\s+(\\d+)s/i, replace: "运行 $1 秒后停止" },
+    { pattern: /^Stopped\\s+after\\s+(\\d+)m/i, replace: "运行 $1 分钟后停止" },
+    { pattern: /^Stopped\\s+after\\s+(\\d+)h/i, replace: "运行 $1 小时后停止" },
+    { pattern: /^Stopped\\s+after\\s+(\\d+)d/i, replace: "运行 $1 天后停止" },
+    { pattern: /^Stopped\\s+after\\s+(.+)/i, replace: "运行 $1 后停止" },
     { pattern: /^Yes, and always allow (.+?) in this project/i, replace: "是的，并且在此项目中始终允许 $1" },
     { pattern: /^Yes, and always allow (.+)/i, replace: "是的，并且始终允许 $1" },
-    { pattern: /^Command:\s*/i, replace: "命令：" }
+    { pattern: /^Command:\\s*/i, replace: "命令：" },
+    { pattern: /^Explored (\\d+) tasks?/i, replace: "探索了 $1 个任务" },
+    { pattern: /^Exploring (\\d+) tasks?/i, replace: "正在探索 $1 个任务" }
   ];
 
   const sensitiveSingleWords = new Set([
@@ -712,20 +677,20 @@ try {
 
   globalThis.__antigravity_translate = function(text) {
     if (!text) return text;
-    const key = text.trim().toLowerCase().replace(/\s+/g, ' ');
+    const leadingSpace = text.match(/^\\s*/)[0];
+    const trailingSpace = text.match(/\\s*$/)[0];
+    const trimmed = text.trim();
+    const key = trimmed.toLowerCase().replace(/\\s+/g, ' ');
     
-    // 敏感单字保护：防止终端、代码等场景下的纯小写单字命令/属性被错误翻译
-    if (sensitiveSingleWords.has(key) && text.trim() === key) {
+    if (sensitiveSingleWords.has(key) && trimmed === key) {
       return text;
     }
     
-    // 精确字典翻译
     if (translationDict[key]) {
-      return translationDict[key];
+      return leadingSpace + translationDict[key] + trailingSpace;
     }
     
-    // 正则表达式替换
-    let temp = text;
+    let temp = trimmed;
     let modified = false;
     for (const item of regexReplacements) {
       const newText = temp.replace(item.pattern, item.replace);
@@ -734,13 +699,13 @@ try {
         modified = true;
       }
     }
-    return modified ? temp : text;
+    return modified ? (leadingSpace + temp + trailingSpace) : text;
   };
 
   function shouldSkipNode(node) {
     let current = node;
     while (current) {
-      if (current.nodeType === 1) { // ELEMENT_NODE
+      if (current.nodeType === 1) {
         const tagName = current.tagName.toLowerCase();
         if (tagName === 'pre' || tagName === 'code' || tagName === 'textarea' || tagName === 'script' || tagName === 'style') {
           return true;
@@ -755,7 +720,6 @@ try {
           ) {
             return true;
           }
-          // 模糊匹配：若类名包含 thought/thinking/message/bubble/markdown/prompt/terminal/xterm/console/shell/bash/editor，则属于会话内容、思考区或终端/编辑器，跳过翻译
           for (let i = 0; i < current.classList.length; i++) {
             const cls = current.classList[i].toLowerCase();
             if (
@@ -790,44 +754,33 @@ try {
   }
 
   function translateTextNode(node) {
-    if (node.nodeType !== 3) return; // Not a TEXT_NODE
+    if (node.nodeType !== 3) return;
     if (shouldSkipNode(node)) return;
     
     let text = node.nodeValue;
     if (!text) return;
     
     const trimmed = text.trim();
-    
-    // 智能处理 Show N breakdown(s) 这样的英语拼接格式
     if (/^Show \\d+ breakdown$/i.test(trimmed)) {
       let next = node.nextSibling;
       if (next && next.nodeType === 3 && next.nodeValue.trim() === 's') {
-        next.nodeValue = ''; // 擦除末尾的复数 s 字符
+        next.nodeValue = '';
       }
       const num = trimmed.match(/\\d+/)[0];
       node.nodeValue = "显示 " + num + " 个细分";
-      return;
-    }
-
-    const key = trimmed.toLowerCase();
-    if (translationDict[key]) {
-      const leadingSpace = text.match(/^\\s*/)[0];
-      const trailingSpace = text.match(/\\s*$/)[0];
-      node.nodeValue = leadingSpace + translationDict[key] + trailingSpace;
-      return;
-    }
-
-    // 尝试正则替换长短语 (直接 replace 以避免 RegExp state lastIndex 陷阱)
-    let modified = false;
-    for (const item of regexReplacements) {
-      const newText = text.replace(item.pattern, item.replace);
-      if (newText !== text) {
-        text = newText;
-        modified = true;
+      if (node.parentNode && node.parentNode.nodeType === 1) {
+        node.parentNode.style.whiteSpace = 'nowrap';
       }
+      return;
     }
-    if (modified) {
-      node.nodeValue = text;
+
+    const translated = globalThis.__antigravity_translate(text);
+    if (translated !== text) {
+      node.nodeValue = translated;
+      if (node.parentNode && node.parentNode.nodeType === 1) {
+        // 自动防止中文字符由于比英文字符宽而在紧凑按钮/标签中折行（例如：跳过、展开按钮）
+        node.parentNode.style.whiteSpace = 'nowrap';
+      }
     }
   }
 
@@ -847,7 +800,6 @@ try {
           }
         }
       }
-      
       let child = node.firstChild;
       while (child) {
         traverseAndTranslate(child);
@@ -856,7 +808,6 @@ try {
     }
   }
 
-  // 监听并动态翻译 DOM
   const observer = new MutationObserver((mutations) => {
     observer.disconnect();
     try {
@@ -886,12 +837,10 @@ try {
     }
   });
 
-  // 页面加载完成后启动
   document.addEventListener('DOMContentLoaded', () => {
     traverseAndTranslate(document.body);
   });
 
-  // 立即开始监听整个 document
   observer.observe(document, {
     childList: true,
     subtree: true,
@@ -1060,28 +1009,33 @@ try {
         return modified ? temp : text;
     }
     `;
-    content = content.replace(
-      "electron_1.ipcMain.handle('notification:send', (_, options) => {",
-      `${mainTranslateCode}
-    electron_1.ipcMain.handle('notification:send', (_, options) => {
-        if (options) {
-            if (options.title) options.title = mainTranslate(options.title);
-            if (options.body) options.body = mainTranslate(options.body);
-        }`
-    );
+    // Only inject if not already present
+    if (!content.includes('const mainTranslationDict = {')) {
+      content = content.replace(
+        "electron_1.ipcMain.handle('notification:send', (_, options) => {",
+        `${mainTranslateCode}\n    electron_1.ipcMain.handle('notification:send', (_, options) => {\n        if (options) {\n            if (options.title) options.title = mainTranslate(options.title);\n            if (options.body) options.body = mainTranslate(options.body);\n        }`
+      );
+    } else {
+      console.log('ipcHandlers.js 翻译代码已存在，跳过注入。');
+    }
     fs.writeFileSync(ipcHandlersPath, content, 'utf8');
     console.log('ipcHandlers.js 修改完成。');
   }
 
   // 10. 使用 npx 打包为 app.asar
   console.log('正在打包修改后的文件为 app.asar...');
-  execSync(`npx -y @electron/asar pack "${tempDir}" "${asarPath}"`, { stdio: 'inherit' });
-  console.log('打包成功！补丁应用完成。');
+  execSync(`npx -y @electron/asar pack "${tempDir}" "${outputAsarPath}"`, { stdio: 'inherit' });
+  console.log('打包成功！已在当前工作区生成 patched_app.asar。');
+
+  // 10b. 自动拷贝并覆盖到应用资源目录
+  console.log('正在自动将打好补丁的包安装到应用资源目录中...');
+  fs.copyFileSync(outputAsarPath, originalAsarPath);
+  console.log('安装成功！应用目录下的 app.asar 已被成功替换。');
 
 } catch (err) {
   console.error('发生错误，正在回滚原始 app.asar...');
-  if (fs.existsSync(backupAsarPath)) {
-    fs.copyFileSync(backupAsarPath, asarPath);
+  if (fs.existsSync(originalBackupAsarPath)) {
+    fs.copyFileSync(originalBackupAsarPath, originalAsarPath);
     console.log('已成功回滚到原始 app.asar。');
   }
   console.error(err);
