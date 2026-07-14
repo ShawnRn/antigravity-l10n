@@ -21,7 +21,7 @@
 
 如果您正在使用 AI 编码助手（如 Antigravity 智能体或其他 Agent），您可以直接复制以下文本并发送给它，它将自动为您完成克隆、注入部署与重启应用：
 
-> **给 Agent 的提示词 / Prompt for Agent:**
+> **给 Agent 的提示词 / Prompt for Agent (macOS):**
 > 
 > ```
 > 请帮我把 Antigravity 客户端汉化。直接在终端执行以下一键命令：
@@ -29,6 +29,16 @@
 > 
 > Please localize my Antigravity client to Chinese. Execute the following commands in the terminal directly:
 > git clone https://github.com/ShawnRn/antigravity-l10n.git /tmp/antigravity-l10n && node apply_patch.js && rm -rf /tmp/antigravity-l10n && killall Antigravity 2>/dev/null || true && open -a Antigravity
+> ```
+
+> **给 Agent 的提示词 / Prompt for Agent (Windows - PowerShell):**
+> 
+> ```
+> 请帮我把 Windows 版 Antigravity 客户端汉化。直接在 PowerShell 中执行以下一键命令：
+> git clone https://github.com/ShawnRn/antigravity-l10n.git "$env:TEMP\antigravity-l10n"; cd "$env:TEMP\antigravity-l10n"; node apply_patch.js; cd ..; Remove-Item -Recurse -Force "$env:TEMP\antigravity-l10n"; Stop-Process -Name Antigravity -Force -ErrorAction SilentlyContinue; Start-Process "$env:LOCALAPPDATA\Programs\antigravity\Antigravity.exe"
+> 
+> Please localize my Windows Antigravity client to Chinese. Execute the following commands in PowerShell directly:
+> git clone https://github.com/ShawnRn/antigravity-l10n.git "$env:TEMP\antigravity-l10n"; cd "$env:TEMP\antigravity-l10n"; node apply_patch.js; cd ..; Remove-Item -Recurse -Force "$env:TEMP\antigravity-l10n"; Stop-Process -Name Antigravity -Force -ErrorAction SilentlyContinue; Start-Process "$env:LOCALAPPDATA\Programs\antigravity\Antigravity.exe"
 > ```
 
 ---
@@ -53,15 +63,15 @@ npm run apply
 ### 2. 刷新或重启界面
 
 补丁应用成功后：
-- 如果您的 Antigravity 客户端已在运行，请在客户端窗口中按下 **`Cmd + R`** (或 `Cmd + Shift + R` 强制刷新) 重新加载渲染进程。
+- 如果您的 Antigravity 客户端已在运行，请在客户端窗口中按下 **`Cmd + R`** (macOS) 或 **`Ctrl + R`** (Windows) (可附加 Shift 强制刷新) 重新加载渲染进程。
 - 您也可以手动退出并重新打开 Antigravity 应用。
 
 ---
 
 ## 目录结构 (Directory Structure)
 
-- `apply_patch.js`：核心补丁脚本，处理 `app.asar` 的自动解密、内容替换、注入、重包与备份。
-- `scan_binary.js`：对 `language_server` 进行静态文本提取与清洗初筛的辅助脚本。
+- `apply_patch.js`：核心补丁脚本，处理 `app.asar` 的自动解密、内容替换、注入、重包与备份（支持 macOS/Windows 双端）。
+- `scan_binary.js`：对 `language_server` 进行静态文本提取与清洗初筛的辅助脚本（支持 macOS/Windows 双端）。
 - `package.json`：定义了 npm 命令与依赖管理。
 - `README.md`：本项目说明文档。
 
@@ -71,6 +81,12 @@ npm run apply
 
 如果需要还原为原始的英文界面，可以直接执行以下命令以恢复备份的 `app.asar`：
 
+**macOS:**
 ```bash
 cp /Applications/Antigravity.app/Contents/Resources/app.asar.bak /Applications/Antigravity.app/Contents/Resources/app.asar
+```
+
+**Windows (PowerShell):**
+```powershell
+Copy-Item "$env:LOCALAPPDATA\Programs\antigravity\resources\app.asar.bak" "$env:LOCALAPPDATA\Programs\antigravity\resources\app.asar" -Force
 ```

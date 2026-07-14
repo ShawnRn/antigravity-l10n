@@ -1,8 +1,47 @@
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 
-const binaryPath = '/Applications/Antigravity.app/Contents/Resources/bin/language_server';
-const outputPath = '/Users/shawnrain/.gemini/antigravity/scratch/scanned_strings.json';
+function detectAppPath() {
+  if (process.platform === 'darwin') {
+    return '/Applications/Antigravity.app';
+  } else if (process.platform === 'win32') {
+    const localAppData = process.env.LOCALAPPDATA;
+    const programFiles = process.env.ProgramFiles;
+    const programFilesX86 = process.env['ProgramFiles(x86)'];
+    
+    const possiblePaths = [];
+    if (localAppData) {
+      possiblePaths.push(path.join(localAppData, 'Programs/antigravity'));
+      possiblePaths.push(path.join(localAppData, 'Programs/Antigravity'));
+    }
+    if (programFiles) {
+      possiblePaths.push(path.join(programFiles, 'Antigravity'));
+      possiblePaths.push(path.join(programFiles, 'antigravity'));
+    }
+    if (programFilesX86) {
+      possiblePaths.push(path.join(programFilesX86, 'Antigravity'));
+      possiblePaths.push(path.join(programFilesX86, 'antigravity'));
+    }
+    
+    for (const p of possiblePaths) {
+      if (fs.existsSync(p)) {
+        return p;
+      }
+    }
+    return possiblePaths[0] || '';
+  }
+  return '';
+}
+
+const appPath = detectAppPath();
+const resourcesPath = process.platform === 'darwin'
+  ? path.join(appPath, 'Contents/Resources')
+  : path.join(appPath, 'resources');
+
+const binaryName = process.platform === 'win32' ? 'language_server.exe' : 'language_server';
+const binaryPath = path.join(resourcesPath, 'bin', binaryName);
+const outputPath = path.join(os.homedir(), '.gemini/antigravity/scratch/scanned_strings.json');
 
 console.log('=== 开始扫描 language_server 二进制字符串 ===');
 
@@ -71,6 +110,10 @@ try {
   const resultList = Array.from(uniqueStrings).sort();
   console.log(`过滤清洗完成！共提取出 ${resultList.length} 条具有 UI 文案特征的独立字符串。`);
 
+  const outputDir = path.dirname(outputPath);
+  if (!fs.existsSync(outputDir)) {
+    fs.mkdirSync(outputDir, { recursive: true });
+  }
   fs.writeFileSync(outputPath, JSON.stringify(resultList, null, 2), 'utf8');
   console.log(`结果已保存至: ${outputPath}`);
 

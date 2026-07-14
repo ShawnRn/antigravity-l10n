@@ -3,8 +3,43 @@ const path = require('path');
 const { execSync } = require('child_process');
 
 // 1. 配置路径
-const appPath = '/Applications/Antigravity.app';
-const resourcesPath = path.join(appPath, 'Contents/Resources');
+function detectAppPath() {
+  if (process.platform === 'darwin') {
+    return '/Applications/Antigravity.app';
+  } else if (process.platform === 'win32') {
+    const localAppData = process.env.LOCALAPPDATA;
+    const programFiles = process.env.ProgramFiles;
+    const programFilesX86 = process.env['ProgramFiles(x86)'];
+    
+    const possiblePaths = [];
+    if (localAppData) {
+      possiblePaths.push(path.join(localAppData, 'Programs/antigravity'));
+      possiblePaths.push(path.join(localAppData, 'Programs/Antigravity'));
+    }
+    if (programFiles) {
+      possiblePaths.push(path.join(programFiles, 'Antigravity'));
+      possiblePaths.push(path.join(programFiles, 'antigravity'));
+    }
+    if (programFilesX86) {
+      possiblePaths.push(path.join(programFilesX86, 'Antigravity'));
+      possiblePaths.push(path.join(programFilesX86, 'antigravity'));
+    }
+    
+    for (const p of possiblePaths) {
+      if (fs.existsSync(p)) {
+        return p;
+      }
+    }
+    return possiblePaths[0] || '';
+  }
+  return '';
+}
+
+const appPath = detectAppPath();
+const resourcesPath = process.platform === 'darwin' 
+  ? path.join(appPath, 'Contents/Resources') 
+  : path.join(appPath, 'resources');
+
 const originalAsarPath = path.join(resourcesPath, 'app.asar');
 const originalBackupAsarPath = path.join(resourcesPath, 'app.asar.bak');
 const outputAsarPath = path.join(__dirname, 'patched_app.asar'); // New output path
@@ -13,8 +48,8 @@ const tempDir = path.join(__dirname, 'temp_extracted_asar');
 console.log('=== Antigravity UI 中文化补丁 (个性化细分增强版) ===');
 
 // 2. 检查 Antigravity 是否存在
-if (!fs.existsSync(appPath)) {
-  console.error(`错误：找不到 Antigravity 应用，路径应为: ${appPath}`);
+if (!appPath || !fs.existsSync(appPath)) {
+  console.error(`错误：找不到 Antigravity 应用。请确认已正确安装。`);
   process.exit(1);
 }
 
@@ -61,10 +96,11 @@ try {
       let createdSymlink = false;
       if (fs.existsSync(originalUnpackedPath) && !fs.existsSync(originalBackupUnpackedPath)) {
         try {
-          fs.symlinkSync(originalUnpackedPath, originalBackupUnpackedPath, 'dir');
+          const type = process.platform === 'win32' ? 'junction' : 'dir';
+          fs.symlinkSync(originalUnpackedPath, originalBackupUnpackedPath, type);
           createdSymlink = true;
         } catch (symErr) {
-          console.warn('创建 app.asar.bak.unpacked 软链接失败:', symErr.message);
+          console.warn('创建 app.asar.bak.unpacked 软链接/联接点失败:', symErr.message);
         }
       }
 
@@ -97,6 +133,22 @@ try {
 (function() {
   try {
   const translationDict = {
+    "file": "文件",
+    "edit": "编辑",
+    "view": "视图",
+    "window": "窗口",
+    "help": "帮助",
+    "create project": "创建项目",
+    "command palette": "命令面板",
+    "minimize": "最小化",
+    "maximize": "最大化",
+    "version": "版本",
+    "check for updates": "检查更新",
+    "actual size": "实际大小",
+    "toggle full screen": "全屏",
+    "toggle developer tools": "开发者工具",
+    "force reload": "强制重新加载",
+    "reload": "重新加载",
     "confirm undo": "确认撤销",
     "this undo action will not make any code changes.": "此撤销操作不会对代码做出任何更改。",
     "sign in": "登录",
@@ -578,6 +630,7 @@ try {
   };
 
   const regexReplacements = [
+    { pattern: /^Version (\\d+\\.\\d+\\.\\d+)$/i, replace: "版本 $1" },
     { pattern: /^Agent needs permission to act on (.+)$/i, replace: "智能体需要操作 $1 的权限" },
     { pattern: /^You have used some of your weekly limit, it will fully refresh in (\\d+) days?, (\\d+) hours?\\.?$/i, replace: "您已使用了一部分周额度限制，它将在 $1 天 $2 小时后完全刷新。" },
     { pattern: /^You have used some of your weekly limit, it will fully refresh in (\\d+) days?\\.?$/i, replace: "您已使用了一部分周额度限制，它将在 $1 天后完全刷新。" },
@@ -1049,4 +1102,4 @@ try {
   console.log('清理完毕。');
 }
 
-console.log('\n补丁成功应用！请手动在 Antigravity 窗口中按下 Cmd+R 重新加载，或手动重启应用。');
+console.log('\n补丁成功应用！请手动在 Antigravity 窗口中按下 Cmd+R (Mac) 或 Ctrl+R (Windows) 重新加载，或手动重启应用。');
